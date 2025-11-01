@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+	<TITLE>ТАРАНИН</TITLE>
+	<meta http-equiv="Content-Type" content="text/html; text/css;charset=utf-8">
+	<link rel="stylesheet" href="c/bootstrap.min.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<STYLE type="text/css">
+		.box1 {	background-color: #0f93ff; width: 100%; height: 150px; }
+		.box3 { background-color: black; width: 100%; height: 300px; }
+
+		.t { flex-wrap: wrap; align-content: space-around; justify-content: space-around; display: flex; }
+		@media (max-height: 1400px) and (orientation: portrait) { 
+			.box2 {	background-color: #B3DDFF; width: 100%; height: 1000px; }
+			.bbox1 { background-color: #B3DDFF; width: 100%; height: 300px; }
+			.bbox2 { background-color: white; width: 100%; height: 2px; margin-left: 10px; margin-right: 10px; }
+		}
+		@media (min-height: 1400px) and (max-height: 2800px) and (orientation: portrait) {
+			.box2 { background-color: #B3DDFF; width: 100%; height: 2000px; }
+			.bbox1 { background-color: #B3DDFF; width: 100%; height: 600px; }
+			.bbox2 { background-color: white; width: 100%; height: 3px; margin-left: 15px; margin-right: 15px; }
+		}
+		@media (min-height: 2800px) and (orientation: portrait) {
+			.box2 { background-color: #B3DDFF; width: 100%; height: 3000px; }
+			.bbox1 { background-color: #B3DDFF; width: 100%; height: 800px; }
+			.bbox2 { background-color: white; width: 100%; height: 6px; margin-left: 15px; margin-right: 15px; }
+		}
+
+		@media (max-height: 1400px) and (orientation: landscape) {
+			.box2 { background-color: #B3DDFF; width: 85.8%; height: 1000px; }
+			.bbox1 { background-color: #B3DDFF; width: 14%; height: 1000px; }
+			.bbox2 { background-color: white; width: 0.2%; height: 980px; margin-top: 10px; }
+		}
+		@media (min-height: 1400px) and (max-height: 1900px) and (orientation: landscape) {
+			.box2 { background-color: #B3DDFF; width: 85.8%; height: 1414px; }
+			.bbox1 { background-color: #B3DDFF; width: 14%; height: 1414px; }
+			.bbox2 { background-color: white; width: 0.2%; height: 1384px; margin-top: 15px; }
+		}
+		@media (min-height: 1900px) and (max-height: 2800px) and (orientation: landscape) {
+			.box2 { background-color: #B3DDFF; width: 85.8%; height: 2346px; }
+			.bbox1 { background-color: #B3DDFF; width: 14%; height: 2346px; }
+			.bbox2 { background-color: white; width: 0.2%; height: 2306px; margin-top: 20px; }
+		}
+		@media (min-height: 2800px) and (orientation: landscape) {
+			.box2 { background-color: #B3DDFF; width: 85.8%; height: 3278px; }
+			.bbox1 { background-color: #B3DDFF; width: 14%; height: 3278px; }
+			.bbox2 { background-color: white; width: 0.2%; height: 3234px; margin-top: 22px; }
+		}
+	</STYLE>
+</HEAD>
+	<BODY>
+		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+		<script defer src="j/bootstrap.bundle.min.js"></script>
+		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+
+		<main>
+			<h1>Посмотреть таблицу</h1>
+			<form method='post' action='serverClient.php'>
+				<p>
+					table <select id="table" name="table">
+						<option value="_order">order</option>
+						<option value="object">object</option>
+						<option value="client">client</option>
+						<option value="worker">worker</option>
+						<option value="human">human</option>
+					</select>
+				</p>
+				<p>id <input type="number" id="idOrder" name="idOrder" /></p>
+				<p id="config"></p>
+				<p><button type="submit">получть информацию</button></p>
+			</form>
+			<br>
+			<h1>Добавить строку</h1>
+			<form method='post' action='serverPlusClient.php'>
+				<p>
+					table <select id="tablePlus" name="tablePlus">
+						<option value="_order">order</option>
+						<option value="object">object</option>
+						<option value="client">client</option>
+						<option value="worker">worker</option>
+						<option value="human">human</option>
+					</select>
+				</p>
+				<p id="configPlus"></p>
+				<p><button type="submit">добавить</button></p>
+			</form>
+		</main>
+
+		<script>
+			function tableChek() {
+				if (document.getElementById('table').value == "_order")
+					document.getElementById('config').innerHTML =
+						'id_client <input type="number" id="id_client" name="id_client" /></p>' +
+						'<p>id_worder <input type="number" id="id_worder" name="id_worder" /></p>' +
+						'<p>date <input type="date" id="date" name="date" /></p>' +
+						'<p>id_object <input type="number" id="id_object" name="id_object" />';
+				else if (document.getElementById('table').value == "object")
+					document.getElementById('config').innerHTML = '';
+				else if (document.getElementById('table').value == "client")
+					document.getElementById('config').innerHTML =
+						'id_human <input type="number" id="id_human" name="id_human" />';
+				else if (document.getElementById('table').value == "worker")
+					document.getElementById('config').innerHTML =
+						'id_human <input type="number" id="id_human" name="id_human" />';
+				else if (document.getElementById('table').value == "human")
+					document.getElementById('config').innerHTML =
+						'phone_number <input type="text" id="phone_number" name="phone_number" />';
+				else
+					document.getElementById('config').innerHTML = '';
+
+				return 0;
+			}
+
+			function tablePlusChek() {
+				if (document.getElementById('tablePlus').value == "_order")
+					document.getElementById('configPlus').innerHTML =
+						'id_client <input type="number" id="id_clientPlus" name="id_clientPlus" /></p>' +
+						'<p>id_worder <input type="number" id="id_worderPlus" name="id_worderPlus" /></p>' +
+						'<p>date <input type="date" id="datePlus" name="datePlus" /></p>' +
+						'<p>failure <input type="text" id="failurePlus" name="failurePlus" /></p>' +
+						'<p>id_object <input type="number" id="id_objectPlus" name="id_objectPlus" />' +
+						'<p>price <input type="number" id="pricePlus" name="pricePlus" />' +
+						'<p>clients_words <input type="text" id="clients_wordsPlus" name="clients_wordsPlus" />' +
+						'<p>status <input type="text" id="statusPlus" name="statusPlus" />';
+				else if (document.getElementById('tablePlus').value == "object")
+					document.getElementById('configPlus').innerHTML =
+						'name <input type="txet" id="namePlus" name="namePlus" />';
+				else if (document.getElementById('tablePlus').value == "client")
+					document.getElementById('configPlus').innerHTML =
+						'id_human <input type="number" id="id_humanPlus" name="id_humanPlus" />';
+				else if (document.getElementById('tablePlus').value == "worker")
+					document.getElementById('configPlus').innerHTML =
+						'id_human <input type="number" id="id_humanPlus" name="id_humanPlus" />';
+				else if (document.getElementById('tablePlus').value == "human")
+					document.getElementById('configPlus').innerHTML =
+						'name <input type="text" id="namePlus" name="namePlus" /></p>' +
+						'<p>phone_number <input type="text" id="phone_numberPlus" name="phone_numberPlus" />';
+				else
+					document.getElementById('configPlus').innerHTML = '';
+
+				return 0;
+			}
+
+			tableChek();
+			tablePlusChek();
+
+			document.getElementById("table").addEventListener("click", () => {
+				tableChek();
+			});
+			document.getElementById("tablePlus").addEventListener("click", () => {
+				tablePlusChek();
+			});
+		</script>
+</BODY>
+</html>

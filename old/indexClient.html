@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<HTML>
+    <HEAD>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<TITLE>ТАРАНИН</TITLE>
+		<STYLE type="text/css">
+			.box0 {
+				min-width:1px;
+				min-height:1px;
+				align-content:flex-start;
+				flex-wrap:wrap;
+				display:flex;
+				padding: 1%;
+			}
+			.boxZ {
+				margin: 0 auto;
+				position:relative;
+				flex-wrap:wrap;
+				display:flex;
+			}
+			.box1,.box2,.box3 {
+				width:550px;
+				min-height:1px;
+				position:relative;
+				align-content:flex-start;
+				flex-wrap:wrap;
+				display:flex;
+				margin: 0 auto;
+			}
+			.box4 {
+				width: 100%;
+				min-height: 10px;
+				position: relative;
+			}
+			.box8 {
+				width: 275px;
+				min-height: 5px;
+				position: relative;
+				margin: 0 auto;
+			}
+			.box9 {
+				width: 550px;
+				min-height: 5px;
+				position: relative;
+			}
+			.box5 {
+				border-right: 2px solid #00c5ff;
+				border-left: 2px solid #00c5ff;
+				height: 100%; width: 0px;
+				position: relative;
+			}
+			.box6 {
+				position: relative;
+				min-width: 1px;
+				border-left: 2px solid #ffffff;
+			}
+			.box7 {
+				width: 550px;
+				min-height: 1px;
+				position: relative;
+				align-content: flex-start;
+				flex-wrap: wrap;
+				display: flex;
+			}
+			.boxD1 {
+				text-align:center;
+				line-height:7px;
+				color: #ffffff;
+			}
+			.boxD2 {
+				min-width:550px;
+				min-height:50px;
+				position:relative;
+				background:#00c5ff;
+			}
+			.boxA1 {
+				border: #00c5ff;
+				background: #ffffff;
+			}
+			.boxB1 {
+				background:#00c5ff;
+				height: 2em;
+				color: #ffffff;
+			}
+			.boxB2 {
+				border-top-color: #ffffff; border-left-color: #ffffff;
+				border-right-color: #ffffff; border-bottom: 2px solid #00c5ff;
+				height: 2em;
+			}
+			.boxC1 {
+				width: 25em; min-width: 1em;
+				text-align: center;
+			}
+			
+			select, textarea, input, button {
+				background:#ffffff;
+				border: 2px solid #00c5ff;
+			}
+			.input1 {
+				min-width: 40em;
+			}
+			select, textarea, input {
+				min-width: 18em;
+			}
+			button  {
+				min-width: 1em;
+			}
+			body {
+				background:#ffffff;
+			}
+			p, h1, tr, td, th, select, option, input, button, textarea {
+				font-family: Avantgarde, sans-serif;
+			}
+			textarea {
+				max-width: 370px;
+			}
+		</STYLE>
+    </HEAD>
+    <BODY>
+		<div class="box0">
+			<div class="boxZ">
+				<div class="box8">
+				<p>Просмотр 
+				<select id="table" name="table">
+					<option value="_order">Заказы</option>
+					<option value="object">Объекты</option>
+					<option value="client">Клиенты</option>
+					<option value="worker">Работники</option>
+					<option value="human">Люди</option>
+				</select>
+				</div>
+				<div class="box8">
+				<p>Дабавление 
+				<select id="tablePlus" name="tablePlus">
+					<option value="_order">Заказы</option>
+					<option value="object">Объекты</option>
+					<option value="client">Клиенты</option>
+					<option value="worker">Работники</option>
+					<option value="human">Люди</option>
+				</select>
+				</div>
+			</div>
+			<div class="box4"></div>
+			
+			<div class="boxZ">
+				<div class="box1">
+					<div class="boxD2"><h1 class="boxD1" id="clientName">Посмотреть информацию</h1></div>
+					<div class="box7">
+						<div class="box5"></div>
+						<div class="box6">
+							<form id="client">
+								<br><div id="config"></div>
+								<p><button type="submit">Посмотреть</button>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="box2">
+					<div class="boxD2"><h1 class="boxD1" id="clientPlusName">Добавить информацию</h1></div>
+					<div class="box7">
+						<div class="box5"></div>
+						<div class="box6">
+							<form id="plus">
+								<br><div id="configPlus"></div>
+								<p><button type="submit">Добавить</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="box4"></div>
+			<div class="boxZ">
+				<div class="box4"><p id="result"></p></div>
+				<div class="box4"><p id="result1"></p></div>
+				<div class="box4"><p id="result2"></p></div>
+			</div>
+		</div>
+		
+		<script>
+			let tableObject; let tableClient; 
+			let tableWorker; let tableHuman;
+			let i11 = ''; let i12 = '';
+			let i21 = ''; let i22 = '';
+			let i31 = ''; let i32 = '';
+			let i41 = '';
+			async function tableSpecialChek()
+			{
+				i11 = i12 = i21 = i22 = i31 = i32 = i41 = 
+					'<option value="">не указана</option>';
+				const response = await fetch('serverClientSpecial.php', {
+					method: 'POST'
+				});
+
+				const result = await response.json();
+				
+				tableObject = result.object;
+				tableClient = result.client;
+				tableWorker = result.worker;
+				tableHuman = result.human;
+				
+				for (let i = 0; i < tableHuman.length; i++)
+				{
+					i11 += '<option value="'+tableHuman[i][0]+'">'+tableHuman[i][1]+'</option>';
+					i12 += '<option value="'+tableHuman[i][0]+'">'+tableHuman[i][2]+'</option>';
+					let c = 0; let c1 = 0;
+					for (let j = 0; j < tableClient.length; j++)
+						if (tableHuman[i][0] == tableClient[j][1])
+							c = 1;
+					for (let j = 0; j < tableWorker.length; j++)
+						if (tableHuman[i][0] == tableWorker[j][1])
+							c1 = 1;
+					if (c == 1)
+					{
+						i21 += '<option value="'+tableHuman[i][0]+'">'+tableHuman[i][1]+'</option>';
+						i22 += '<option value="'+tableHuman[i][0]+'">'+tableHuman[i][2]+'</option>';
+					}
+					if (c1 == 1)
+					{
+						i31 += '<option value="'+tableHuman[i][0]+'">'+tableHuman[i][1]+'</option>';
+						i32 += '<option value="'+tableHuman[i][0]+'">'+tableHuman[i][2]+'</option>';
+					}
+				}
+				for (let i = 0; i < tableObject.length; i++)
+					i41 += '<option value="'+tableObject[i][0]+'">'+tableObject[i][1]+'</option>';
+
+				tableChek();
+				tablePlusChek();
+				return 0;
+			}
+			
+			function tableChek()
+			{
+				if (document.getElementById('table').value == "_order")
+				{
+					document.getElementById('config').innerHTML = 
+					'<table>'+
+					'<tr><td>Имя клиента </td><td>'+
+					'<select id="name_client"  name="name_client">'+i21+'</select></td></tr>'+
+					'<tr><td>Телефон клиента </td><td>'+
+					'<select id="phone_client" name="phone_client">'+i22+'</select></td></tr>'+
+					'<tr><td>Имя работника </td><td>'+
+					'<select id="name_worder" name="name_worder">'+i31+'</select></td></tr>'+
+					'<tr><td>Телефон работника </td><td>'+
+					'<select id="phone_worder" name="phone_worder">'+i32+'</select></td></tr>'+
+					'<tr><td>Дата </td>'+
+					'<td><input type="date" id="date" name="date" /></td></tr>'+
+					'<tr><td>Название объекта </td><td>'+
+					'<select id="id_object"  name="id_object">'+i41+'</select></td></tr>'+
+					'<tr><td>Номер заказа</td>'+
+					'<td><input type="number" id="id_order" name="id_order" /></td></tr>'+
+					'</table>';
+					document.getElementById('clientName').innerHTML = 'Просмотр заказов';
+				}
+				else if (document.getElementById('table').value == "object")
+				{
+					document.getElementById('config').innerHTML = 
+					'Название объекта <select id="id_object"  name="id_object">'+i41+'</select>';
+					document.getElementById('clientName').innerHTML = 'Просмотр объектов';
+				}
+				else if (document.getElementById('table').value == "client")
+				{
+					document.getElementById('config').innerHTML = 
+					'<table>'+
+					'<tr><td>Имя клиента </td><td>'+
+					'<select id="name_client"  name="name_client">'+i21+'</select></td></tr>'+
+					'<tr><td>Телефон клиента </td><td>'+
+					'<select id="phone_client" name="phone_client">'+i22+'</select></td></tr>'+
+					'</table>';
+					document.getElementById('clientName').innerHTML = 'Просмотр клиентов';
+				}
+				else if (document.getElementById('table').value == "worker")
+				{
+					document.getElementById('config').innerHTML = 
+					'<table>'+
+					'<tr><td>Имя работника </td><td>'+
+					'<select id="name_worder" name="name_worder">'+i31+'</select></td></tr>'+
+					'<tr><td>Телефон работника </td><td>'+
+					'<select id="phone_worder" name="phone_worder">'+i32+'</select></td></tr>'+
+					'</table>';
+					document.getElementById('clientName').innerHTML = 'Просмотр работников';
+				}
+				else if (document.getElementById('table').value == "human")
+				{
+					document.getElementById('config').innerHTML = 
+					'<table>'+
+					'<tr><td>Имя </td><td>'+
+					'<select id="name" name="name">'+i11+'</select></td></tr>'+
+					'<tr><td>Телефон </td><td>'+
+					'<select id="phone_number" name="phone_number">'+i12+'</select></td></tr>'+
+					'</table>';
+					document.getElementById('clientName').innerHTML = 'Просмотр людей';
+				}
+				else
+					document.getElementById('config').innerHTML = '';
+					
+				return 0;
+			}
+			
+			function tablePlusChek()
+			{
+				if (document.getElementById('tablePlus').value == "_order")
+				{
+					document.getElementById('configPlus').innerHTML = 
+					'<table>'+
+					'<tr><td>Имя клиента </td><td>'+
+					'<select id="name_clientPlus"  name="name_clientPlus">'+i21+'</select></td></tr>'+
+					'<tr><td>Телефон клиента </td><td>'+
+					'<select id="phone_clientPlus" name="phone_clientPlus">'+i22+'</select></td></tr>'+
+					'<tr><td>Имя работника </td><td>'+
+					'<select id="name_worderPlus" name="name_worderPlus">'+i31+'</select></td></tr>'+
+					'<tr><td>Телефон работника </td><td>'+
+					'<select id="phone_worderPlus" name="phone_worderPlus">'+i32+'</select></td></tr>'+
+					'<tr><td>Дата </td>'+
+					'<td><input type="date" id="datePlus" name="datePlus" /></td></tr>'+
+					'<tr><td>Поломка </td>'+
+					'<td><input type="text" id="failurePlus" name="failurePlus" /></td></tr>'+
+					'<tr><td>Название объекта </td><td>'+
+					'<select id="id_objectPlus" name="id_objectPlus">'+i41+'</select></td></tr>'+
+					'<tr><td>Цена </td>'+
+					'<td><input type="number" id="pricePlus" name="pricePlus" /></td></tr>'+
+					'<tr><td>Со слов клиента </td>'+
+					'<td><textarea type="text" id="clients_wordsPlus" name="clients_wordsPlus" ></textarea></td></tr>'+
+					'<tr><td>Статус </td>'+
+					'<td>'/*'<input type="text" id="statusPlus" name="statusPlus" /></td></tr>'*/+
+					'<select id="statusPlus" name="statusPlus">'+
+					'<option value="новый">Новый</option>'+
+					'<option value="диагностика">Диагностика</option>'+
+					'<option value="ремонт">Ремонт</option>'+
+					'<option value="выдано">Выдано</option>'+
+					'<option value="готова к выдаче">Готова к выдаче</option>'+
+					'<option value="не подлежит ремонту">Не подлежит ремонту</option>'+
+					'</select></td></tr>'+
+					'<tr><td>Номер заказа</td>'+
+					'<td><input type="number" id="id_orderPlus" name="id_orderPlus" /></td></tr>'+
+					'</table>';
+					document.getElementById('clientPlusName').innerHTML = 'Добавление заказов';
+				}
+				else if (document.getElementById('tablePlus').value == "object")
+				{
+					document.getElementById('configPlus').innerHTML = 
+					'Названия <input type="text" id="namePlus" name="namePlus" />';
+					document.getElementById('clientPlusName').innerHTML = 'Добавление объектов';
+				}
+				else if (document.getElementById('tablePlus').value == "client")
+				{
+					document.getElementById('configPlus').innerHTML = 
+                    '<table>' +
+                    '<tr><td>Имя клиента </td><td>' +
+                    '<select id="name_clientPlus"  name="name_clientPlus">' + i11 + '</select></td></tr>' +
+                    '<tr><td>Телефон клиента </td><td>' +
+                    '<select id="phone_clientPlus" name="phone_clientPlus">' + i12 + '</select></td></tr>' +
+                    '</table>';
+					document.getElementById('clientPlusName').innerHTML = 'Добавление клиентов';
+				}
+				else if (document.getElementById('tablePlus').value == "worker")
+				{
+					document.getElementById('configPlus').innerHTML = 
+					'<table>' +
+					'<tr><td>Имя работника </td><td>' +
+					'<select id="name_worderPlus" name="name_worderPlus">' + i11 + '</select></td></tr>' +
+					'<tr><td>Телефон работника </td><td>' +
+					'<select id="phone_worderPlus" name="phone_worderPlus">' + i12 + '</select></td></tr>' +
+					'</table>';
+					document.getElementById('clientPlusName').innerHTML = 'Добавление работников';
+				}
+				else if (document.getElementById('tablePlus').value == "human")
+				{
+					document.getElementById('configPlus').innerHTML = 
+					'<table>'+
+					'<tr><td>Имя </td>'+
+					'<td><input type="text" id="namePlus" name="namePlus" /></td></tr>'+
+					'<tr><td>Номер телефона </td>'+
+					'<td><input type="text" id="phone_numberPlus" name="phone_numberPlus" /></td></tr>'+
+					'</table>';
+					document.getElementById('clientPlusName').innerHTML = 'Добавление людей';
+				}
+				else
+					document.getElementById('configPlus').innerHTML = '';
+					
+				return 0;
+			}
+
+			tableSpecialChek();
+			
+			document.getElementById("table").addEventListener("click", () => {
+				tableChek();
+			});
+			document.getElementById("tablePlus").addEventListener("click", () => {
+				tablePlusChek();
+			});
+			
+			document.getElementById('client').addEventListener('submit', async function (e) {
+				e.preventDefault();
+				
+				const formData = new FormData();
+				formData.append('table',document.getElementById('table').value);
+				if (document.getElementById('table').value == '_order')
+				{
+					formData.append('date', document.getElementById('date').value);
+                    formData.append('name_client', document.getElementById('name_client').value);
+                    formData.append('phone_client', document.getElementById('phone_client').value);
+                    formData.append('name_worder', document.getElementById('name_worder').value);
+                    formData.append('phone_worder', document.getElementById('phone_worder').value);
+                    formData.append('id_object', document.getElementById('id_object').value);
+                    formData.append('id_order',document.getElementById('id_order').value);
+				}
+				if (document.getElementById('table').value == 'client')
+				{
+                    formData.append('name_client', document.getElementById('name_client').value);
+                    formData.append('phone_client', document.getElementById('phone_client').value);
+				}
+				if (document.getElementById('table').value == 'worker')
+				{
+                    formData.append('name_worder', document.getElementById('name_worder').value);
+                    formData.append('phone_worder', document.getElementById('phone_worder').value);
+				}
+				if (document.getElementById('table').value == 'human')
+				{
+					formData.append('phone_number',document.getElementById('phone_number').value);
+                    formData.append('name', document.getElementById('name').value);
+				}
+				if (document.getElementById('table').value == 'object')
+				{
+                    formData.append('id_object', document.getElementById('id_object').value);
+                }
+
+				const response = await fetch('serverClient.php', {
+					method: 'POST',
+					body: formData,
+				});
+				
+				const result = await response.text();
+				document.getElementById('result').innerHTML = result;
+				document.getElementById('result1').innerHTML = '';
+				
+			});
+			
+			document.getElementById('plus').addEventListener('submit', async function (e) {
+				e.preventDefault();
+				
+				const formData = new FormData();
+				formData.append('tablePlus',document.getElementById('tablePlus').value);
+				if (document.getElementById('tablePlus').value == '_order')
+				{
+                    formData.append('name_clientPlus', document.getElementById('name_clientPlus').value);
+                    formData.append('phone_clientPlus', document.getElementById('phone_clientPlus').value);
+                    formData.append('name_worderPlus', document.getElementById('name_worderPlus').value);
+                    formData.append('phone_worderPlus', document.getElementById('phone_worderPlus').value);
+					formData.append('datePlus',document.getElementById('datePlus').value);
+					formData.append('failurePlus',document.getElementById('failurePlus').value);
+					formData.append('id_objectPlus',document.getElementById('id_objectPlus').value);
+					formData.append('pricePlus',document.getElementById('pricePlus').value);
+					formData.append('clients_wordsPlus',document.getElementById('clients_wordsPlus').value);
+					formData.append('statusPlus',document.getElementById('statusPlus').value);
+					formData.append('id_orderPlus',document.getElementById('id_orderPlus').value);
+				}
+				if (document.getElementById('tablePlus').value == 'object')
+				{
+					formData.append('namePlus',document.getElementById('namePlus').value);
+				}
+				if (document.getElementById('tablePlus').value == 'client')
+				{
+                    formData.append('name_clientPlus', document.getElementById('name_clientPlus').value);
+                    formData.append('phone_clientPlus', document.getElementById('phone_clientPlus').value);
+				}
+				if (document.getElementById('tablePlus').value == 'worker')
+				{
+                    formData.append('name_worderPlus', document.getElementById('name_worderPlus').value);
+                    formData.append('phone_worderPlus', document.getElementById('phone_worderPlus').value);
+				}
+				if (document.getElementById('tablePlus').value == 'human')
+				{
+					formData.append('namePlus',document.getElementById('namePlus').value);
+					formData.append('phone_numberPlus',document.getElementById('phone_numberPlus').value);
+				}
+				
+				const response = await fetch('serverPlusClient.php', {
+					method: 'POST',
+					body: formData,
+				});
+				
+				const result = await response.text();
+				document.getElementById('result1').innerHTML = result;
+				
+				const formData1 = new FormData();
+				formData1.append('table',document.getElementById('tablePlus').value);
+				const response1 = await fetch('serverClient.php', {
+					method: 'POST',
+					body: formData1,
+				});
+				
+				const result1 = await response1.text();
+				document.getElementById('result').innerHTML = result1;
+                tableSpecialChek();
+			});
+
+		</script>
+    </body>
+</html>

@@ -1,0 +1,427 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 14.15
+-- Dumped by pg_dump version 14.15
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: PCLD; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE "PCLD" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'ru_RU.UTF-8';
+
+
+ALTER DATABASE "PCLD" OWNER TO postgres;
+
+\connect "PCLD"
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: _order; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public._order (
+    id integer NOT NULL,
+    id_client integer,
+    id_worker integer,
+    date date,
+    failure character varying,
+    id_object integer,
+    price integer,
+    clients_words character varying,
+    status character varying(40)
+);
+
+
+ALTER TABLE public._order OWNER TO postgres;
+
+--
+-- Name: client; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.client (
+    id integer NOT NULL,
+    id_human integer
+);
+
+
+ALTER TABLE public.client OWNER TO postgres;
+
+--
+-- Name: client_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.client_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.client_id_seq OWNER TO postgres;
+
+--
+-- Name: client_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.client_id_seq OWNED BY public.client.id;
+
+
+--
+-- Name: human; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.human (
+    id integer NOT NULL,
+    name character varying(20),
+    phone_number character varying(15)
+);
+
+
+ALTER TABLE public.human OWNER TO postgres;
+
+--
+-- Name: human_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.human_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.human_id_seq OWNER TO postgres;
+
+--
+-- Name: human_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.human_id_seq OWNED BY public.human.id;
+
+
+--
+-- Name: object; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.object (
+    id integer NOT NULL,
+    name character varying(50)
+);
+
+
+ALTER TABLE public.object OWNER TO postgres;
+
+--
+-- Name: object for repair_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public."object for repair_id_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public."object for repair_id_seq" OWNER TO postgres;
+
+--
+-- Name: object for repair_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public."object for repair_id_seq" OWNED BY public.object.id;
+
+
+--
+-- Name: order_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.order_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.order_id_seq OWNER TO postgres;
+
+--
+-- Name: order_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.order_id_seq OWNED BY public._order.id;
+
+
+--
+-- Name: worker; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.worker (
+    id integer NOT NULL,
+    id_human integer
+);
+
+
+ALTER TABLE public.worker OWNER TO postgres;
+
+--
+-- Name: worker_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.worker_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.worker_id_seq OWNER TO postgres;
+
+--
+-- Name: worker_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.worker_id_seq OWNED BY public.worker.id;
+
+
+--
+-- Name: _order id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public._order ALTER COLUMN id SET DEFAULT nextval('public.order_id_seq'::regclass);
+
+
+--
+-- Name: client id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.client ALTER COLUMN id SET DEFAULT nextval('public.client_id_seq'::regclass);
+
+
+--
+-- Name: human id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.human ALTER COLUMN id SET DEFAULT nextval('public.human_id_seq'::regclass);
+
+
+--
+-- Name: object id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.object ALTER COLUMN id SET DEFAULT nextval('public."object for repair_id_seq"'::regclass);
+
+
+--
+-- Name: worker id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.worker ALTER COLUMN id SET DEFAULT nextval('public.worker_id_seq'::regclass);
+
+
+--
+-- Data for Name: _order; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public._order (id, id_client, id_worker, date, failure, id_object, price, clients_words, status) FROM stdin;
+1	1	1	2025-04-11	охлаждение	1	500	видеокарта нагревается	починка
+\.
+
+
+--
+-- Data for Name: client; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.client (id, id_human) FROM stdin;
+1	2
+\.
+
+
+--
+-- Data for Name: human; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.human (id, name, phone_number) FROM stdin;
+1	ЛЛЛ	+48586424554
+2	HHH	+15646545573
+\.
+
+
+--
+-- Data for Name: object; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.object (id, name) FROM stdin;
+1	Nvidia GeForce RTX 3060 12 GB
+2	Nvidia GeForce RTX 2060 6 GB
+3	Nvidia GeForce RTX 2050 4 GB
+4	Nvidia GeForce RTX 4050 6 GB
+6	Nvidia GeForce RTX 4060 Ti 16 GB
+9	Nvidia GeForce RTX 5090 32 GB
+\.
+
+
+--
+-- Data for Name: worker; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.worker (id, id_human) FROM stdin;
+1	1
+\.
+
+
+--
+-- Name: client_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.client_id_seq', 1, true);
+
+
+--
+-- Name: human_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.human_id_seq', 2, true);
+
+
+--
+-- Name: object for repair_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."object for repair_id_seq"', 9, true);
+
+
+--
+-- Name: order_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.order_id_seq', 1, true);
+
+
+--
+-- Name: worker_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.worker_id_seq', 1, true);
+
+
+--
+-- Name: client client_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.client
+    ADD CONSTRAINT client_pk PRIMARY KEY (id);
+
+
+--
+-- Name: human human_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.human
+    ADD CONSTRAINT human_pk PRIMARY KEY (id);
+
+
+--
+-- Name: object object_for_repair_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.object
+    ADD CONSTRAINT object_for_repair_pk PRIMARY KEY (id);
+
+
+--
+-- Name: _order order_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public._order
+    ADD CONSTRAINT order_pk PRIMARY KEY (id);
+
+
+--
+-- Name: worker worker_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.worker
+    ADD CONSTRAINT worker_pk PRIMARY KEY (id);
+
+
+--
+-- Name: client client_human_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.client
+    ADD CONSTRAINT client_human_fk FOREIGN KEY (id_human) REFERENCES public.human(id);
+
+
+--
+-- Name: _order order_client_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public._order
+    ADD CONSTRAINT order_client_fk FOREIGN KEY (id_client) REFERENCES public.client(id);
+
+
+--
+-- Name: _order order_object_for_repair_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public._order
+    ADD CONSTRAINT order_object_for_repair_fk FOREIGN KEY (id_object) REFERENCES public.object(id);
+
+
+--
+-- Name: _order order_worker_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public._order
+    ADD CONSTRAINT order_worker_fk FOREIGN KEY (id_worker) REFERENCES public.worker(id);
+
+
+--
+-- Name: worker worker_human_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.worker
+    ADD CONSTRAINT worker_human_fk FOREIGN KEY (id_human) REFERENCES public.human(id);
+
+
+--
+-- PostgreSQL database dump complete
+--
+
