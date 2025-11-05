@@ -1,1 +1,1 @@
-psql --host=localhost --username=postgres --password --file=ResBasisData
+psql -h localhost -U postgres -W -f ./ResBasisData
