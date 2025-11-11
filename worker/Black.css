@@ -9,6 +9,8 @@ a {
     text-decoration: none;
 }
 .boxP0 {
+    min-width: 0px;
+    max-width: 1473px;
     padding: 25px;
     position: absolute;
     left: 0px;
@@ -16,6 +18,7 @@ a {
     align-content: flex-start;
     flex-wrap: wrap;
     display: flex;
+    margin: 0 auto;
 }
 .boxP1 {
     position: fixed;
@@ -26,7 +29,7 @@ a {
     flex-wrap: wrap;
     display: flex;
 }
-.box0, .box1, .box2, .box3, .box4, .box5, .box6, .box7, .box8, .box9, .box10, .box11 {
+.box0, .box1, .box2, .box3, .box4, .box5, .box6, .box7, .box8, .box9, .box10, .box11, .box12, .box13, .box14, .box15 {
     position: relative;
     align-content: flex-start;
     flex-wrap: wrap;
@@ -40,11 +43,12 @@ a {
     box-shadow: 0 0 7px rgba(0,0,0,1);
     background-color: #101045;
     overflow-y: auto;
-    border-radius: 25px
+    border-radius: 25px;
+    margin-bottom: 20px;
 }
 .box1 {
     width: 1200px;
-    min-height: 140px;
+    min-height: 120px;
     background-color: #1b1b1b;
     box-shadow: 0 0 5px rgba(0,0,0,1);
     overflow-y: auto;
@@ -53,8 +57,7 @@ a {
 }
 .box2 {    
     width: 100vw;
-    min-height: 100px;
-    background-color: #1b1b1b;
+    min-height: 80px;
     overflow-y: auto;
     margin: 20px 20px 20px 20px;
 }
@@ -89,7 +92,6 @@ a {
 .box7 {
     width: 100vw;
     min-height: 102px;
-    background-color: #1b1b1b;
     overflow-y: auto;
     margin: 10px 10px 10px 10px;
 }
@@ -115,6 +117,38 @@ a {
     border-radius: 10px;
     width: 169px;
     min-height: 40px;
+}
+.box12 {
+    width: 1473px;
+    min-width: 253px;
+    min-height: 60px;
+    box-shadow: 0 0 7px rgba(0,0,0,1);
+    background-color: #101045;
+    overflow-y: auto;
+    border-radius: 25px;
+    margin-bottom: 20px;
+}
+.box13 {
+    width: 100vw;
+    min-height: 40px;
+    overflow-y: auto;
+    margin: 10px 10px 10px 10px;
+}
+.box14 {
+    width: 1473px;
+    min-width: 253px;
+    min-height: 160px;
+    box-shadow: 0 0 7px rgba(0,0,0,1);
+    background-color: #101045;
+    overflow-y: auto;
+    border-radius: 25px;
+    margin-bottom: 20px;
+}
+.box15 {
+    width: 100vw;
+    min-height: 120px;
+    overflow-y: auto;
+    margin: 10px 10px 10px 10px;
 }
 .boxO0 {
     position: relative;
@@ -182,6 +216,9 @@ textarea {
 input:focus, select:focus, textarea:focus {
 	border-color: #3030b1;
 }
+.boxTW0 {
+    width: 165px;
+}
 .boxT0 {
     text-align: center;
     margin: 0 auto;
@@ -219,6 +256,14 @@ input:focus, select:focus, textarea:focus {
     margin: 0 7px 0 7px;
     line-height: 40px;
     font-size: 14pt;
+}
+.boxT5 {
+    text-align: center;
+    margin: 0 auto;
+    color: #ffffff;
+    margin: 0 0 0 25px;
+    line-height: 40px;
+    font-size: 18pt;
 }
 th {
     background-color: #101045;
