@@ -14,33 +14,28 @@ $result = pg_query($basisData, $query);
 if (!$result)
 	printExit("<p>Ошибка запроса: <p>".pg_last_error()."<p>".$query);
 
-$object = []; $i = 0;
+$object = []; $i = 0; $h = "";
 $p = pg_num_fields($result);
 while ($line = pg_fetch_array($result, null, PGSQL_ASSOC))
 {
 	foreach ($line as $col_value)
 	{
-		if ($i == 0)
+		$j = 1;
+		foreach ($object as $col_value1)
 		{
-			$object[0] = $col_value; $i++;
+			if ($col_value1 == $col_value) $j = 0;
 		}
-		else
+		$h .= $j." ";
+		if ($j == 1)
 		{
-			$j == 1;
-			foreach ($object as $col_value1)
-			{
-				if ($col_value1 == $col_value) $j == 0;
-			}
-			if ($j == 1)
-			{
-				$object[$i] = $col_value; $i++;
-			}
+			$object[$i] = $col_value; $i++;
 		}
 	}
 }
 
 header('Content-type: application/json');
 $data['object'] = $object;
+$data['log'] = $h;
 echo json_encode($data);
 
 pg_close($con);
