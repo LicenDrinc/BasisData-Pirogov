@@ -80,5 +80,5 @@ $result = pg_query($basisData, $query);
 if (!$result)
 	printExit("<p>Ошибка запроса: <p>".pg_last_error()."<p>".$query);
 
-pg_close($con);
+pg_close($basisData);
 ?>

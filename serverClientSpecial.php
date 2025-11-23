@@ -65,6 +65,6 @@ $data['object'] = $object; $data['client'] = $client;
 $data['worker'] = $worker; $data['human'] = $human;
 echo json_encode($data);
 
-pg_close($con);
+pg_close($basisData);
 //print "<form action='indexClient.html'><p><button type='submit'>вернутся</button></p></form>";
 ?>

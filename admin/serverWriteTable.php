@@ -164,5 +164,5 @@ while ($line = $line1)
 	print "</tr>";
 }
 print "</table>";
-pg_close($con);
+pg_close($basisData);
 ?>

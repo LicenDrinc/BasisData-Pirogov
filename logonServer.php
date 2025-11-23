@@ -49,7 +49,7 @@ while ($line = pg_fetch_array($result, null, PGSQL_ASSOC))
 		$i++;
 	}
 }
-pg_close($con);
+pg_close($basisData);
 if ($id == 0)
 	printExit("неверый логин или пароль");
 else

@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.12
--- Dumped by pg_dump version 14.12
+-- Dumped from database version 14.15
+-- Dumped by pg_dump version 14.15
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -53,9 +53,10 @@ CREATE TABLE public._order (
     date date,
     failure character varying,
     id_object integer,
-    price integer,
+    price character varying(20),
     clients_words character varying,
-    status character varying(40)
+    status character varying(40),
+    id_order integer
 );
 
 
@@ -187,6 +188,70 @@ ALTER SEQUENCE public.order_id_seq OWNED BY public._order.id;
 
 
 --
+-- Name: users_client; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users_client (
+    id integer NOT NULL,
+    id_client integer,
+    name character varying(50),
+    password character varying(50)
+);
+
+
+ALTER TABLE public.users_client OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.users_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_id_seq OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.users_id_seq OWNED BY public.users_client.id;
+
+
+--
+-- Name: users_admin; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users_admin (
+    id integer DEFAULT nextval('public.users_id_seq'::regclass) NOT NULL,
+    id_admin integer,
+    name character varying(50),
+    password character varying(50)
+);
+
+
+ALTER TABLE public.users_admin OWNER TO postgres;
+
+--
+-- Name: users_worker; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users_worker (
+    id integer DEFAULT nextval('public.users_id_seq'::regclass) NOT NULL,
+    id_worker integer,
+    name character varying(50),
+    password character varying(50)
+);
+
+
+ALTER TABLE public.users_worker OWNER TO postgres;
+
+--
 -- Name: worker; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -249,6 +314,13 @@ ALTER TABLE ONLY public.object ALTER COLUMN id SET DEFAULT nextval('public."obje
 
 
 --
+-- Name: users_client id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_client ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+
+
+--
 -- Name: worker id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -259,8 +331,16 @@ ALTER TABLE ONLY public.worker ALTER COLUMN id SET DEFAULT nextval('public.worke
 -- Data for Name: _order; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public._order (id, id_client, id_worker, date, failure, id_object, price, clients_words, status) FROM stdin;
-1	1	1	2025-04-11	охлаждение	1	500	видеокарта нагревается	починка
+COPY public._order (id, id_client, id_worker, date, failure, id_object, price, clients_words, status, id_order) FROM stdin;
+3	1	1	2025-04-11	охлаждение	1	500	видеокарта нагревается	ремонт	1
+5	1	1	2025-04-13	охлаждение	1	500	видеокарта нагревается	выдано	1
+4	1	1	2025-04-11	охлаждение	1	500	видеокарта нагревается	готова к выдаче	1
+1	1	1	2025-04-11	-	1	-	видеокарта нагревается	новый	1
+2	1	1	2025-04-11	-	1	-	видеокарта нагревается	диагностика	1
+6	3	1	2025-05-01	-	3	-	-	новый	6
+7	3	1	2025-05-01	-	3	-	-	диагностика	6
+8	3	1	2025-05-01	-	3	-	-	не подлежит ремонту	6
+9	3	1	2025-05-02	-	3	-	-	выдано	6
 \.
 
 
@@ -270,6 +350,7 @@ COPY public._order (id, id_client, id_worker, date, failure, id_object, price, c
 
 COPY public.client (id, id_human) FROM stdin;
 1	2
+3	3
 \.
 
 
@@ -280,6 +361,10 @@ COPY public.client (id, id_human) FROM stdin;
 COPY public.human (id, name, phone_number) FROM stdin;
 1	ЛЛЛ	+48586424554
 2	HHH	+15646545573
+3	МММ	+48464876574
+4	LicenDrinc	none
+6	T T T	+11111
+7	Р Р Р	+122222
 \.
 
 
@@ -290,10 +375,74 @@ COPY public.human (id, name, phone_number) FROM stdin;
 COPY public.object (id, name) FROM stdin;
 1	Nvidia GeForce RTX 3060 12 GB
 2	Nvidia GeForce RTX 2060 6 GB
-3	Nvidia GeForce RTX 2050 4 GB
 4	Nvidia GeForce RTX 4050 6 GB
 6	Nvidia GeForce RTX 4060 Ti 16 GB
 9	Nvidia GeForce RTX 5090 32 GB
+3	Nvidia GeForce RTX 2070 8 GB
+11	Nvidia GeForce RTX 2060 SUPER 8 GB
+12	Nvidia GeForce RTX 2070 SUPER 8 GB
+13	Nvidia GeForce RTX 2080 8 GB
+14	Nvidia GeForce RTX 2080 SUPER 8 GB
+15	Nvidia GeForce RTX 2080 Ti 12 GB
+16	Nvidia GeForce RTX 3050 6 GB
+17	Nvidia GeForce RTX 3060 Ti 8 GB
+18	Nvidia GeForce RTX 3070 8 GB
+19	Nvidia GeForce RTX 3070 Ti 8 GB
+20	Nvidia GeForce RTX 3080 10 GB
+21	Nvidia GeForce RTX 3080 Ti 12 GB
+22	Nvidia GeForce RTX 3090 24 GB
+23	Nvidia GeForce RTX 3090 Ti 24 GB
+24	Nvidia GeForce RTX 4070 12 GB
+25	Nvidia GeForce RTX 4070 SUPER 12 GB
+26	Nvidia GeForce RTX 4070 Ti 12 GB
+27	Nvidia GeForce RTX 4070 Ti SUPER 16 GB
+28	Nvidia GeForce RTX 4080 16 GB
+29	Nvidia GeForce RTX 4080 SUPER 16 GB
+30	Nvidia GeForce RTX 4090 D 24 GB
+31	Nvidia GeForce RTX 4090 24 GB
+32	Nvidia GeForce RTX 5050 8 GB
+33	Nvidia GeForce RTX 5060 8 GB
+35	Nvidia GeForce RTX 5070 12 GB
+36	Nvidia GeForce RTX 5070 Ti 16 GB
+37	Nvidia GeForce RTX 5080 16 GB
+10	Nvidia GeForce RTX 4060 8 GB
+34	Nvidia GeForce RTX 5060 Ti 16 GB
+38	Nvidia GeForce RTX 5090 D 48 GB
+39	Nvidia GeForce RTX 5060 Ti 8 GB
+40	Nvidia GeForce RTX 3060 8 GB
+41	Nvidia GeForce RTX 4060 Ti 8 GB
+\.
+
+
+--
+-- Data for Name: users_admin; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users_admin (id, id_admin, name, password) FROM stdin;
+1	4	LicenDrinc	Lick
+\.
+
+
+--
+-- Data for Name: users_client; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users_client (id, id_client, name, password) FROM stdin;
+4	4	LicenDrinc	aaaa
+5	2	test2	2
+6	3	test3	3
+\.
+
+
+--
+-- Data for Name: users_worker; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users_worker (id, id_worker, name, password) FROM stdin;
+2	4	LicenDrinc	kciL
+3	1	test1	1
+8	3	test2	111
+9	4	test3	12
 \.
 
 
@@ -303,6 +452,9 @@ COPY public.object (id, name) FROM stdin;
 
 COPY public.worker (id, id_human) FROM stdin;
 1	1
+2	4
+3	6
+4	7
 \.
 
 
@@ -310,35 +462,42 @@ COPY public.worker (id, id_human) FROM stdin;
 -- Name: client_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.client_id_seq', 1, true);
+SELECT pg_catalog.setval('public.client_id_seq', 3, true);
 
 
 --
 -- Name: human_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.human_id_seq', 2, true);
+SELECT pg_catalog.setval('public.human_id_seq', 7, true);
 
 
 --
 -- Name: object for repair_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."object for repair_id_seq"', 9, true);
+SELECT pg_catalog.setval('public."object for repair_id_seq"', 41, true);
 
 
 --
 -- Name: order_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.order_id_seq', 1, true);
+SELECT pg_catalog.setval('public.order_id_seq', 9, true);
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.users_id_seq', 9, true);
 
 
 --
 -- Name: worker_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.worker_id_seq', 1, true);
+SELECT pg_catalog.setval('public.worker_id_seq', 4, true);
 
 
 --
@@ -371,6 +530,30 @@ ALTER TABLE ONLY public.object
 
 ALTER TABLE ONLY public._order
     ADD CONSTRAINT order_pk PRIMARY KEY (id);
+
+
+--
+-- Name: users_admin users_admin_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_admin
+    ADD CONSTRAINT users_admin_pk PRIMARY KEY (id);
+
+
+--
+-- Name: users_client users_client_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_client
+    ADD CONSTRAINT users_client_pk PRIMARY KEY (id);
+
+
+--
+-- Name: users_worker users_worker_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_worker
+    ADD CONSTRAINT users_worker_pk PRIMARY KEY (id);
 
 
 --

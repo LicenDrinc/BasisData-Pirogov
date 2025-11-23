@@ -38,5 +38,5 @@ $data['object'] = $object;
 $data['log'] = $h;
 echo json_encode($data);
 
-pg_close($con);
+pg_close($basisData);
 ?>

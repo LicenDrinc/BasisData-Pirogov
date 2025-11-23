@@ -46,6 +46,6 @@ if (!$result)
 while ($line = pg_fetch_array($result, null, PGSQL_ASSOC))
 	printExit("Уже есть человек с таким логином");
 
-pg_close($con);
+pg_close($basisData);
 printExit("0");
 ?>

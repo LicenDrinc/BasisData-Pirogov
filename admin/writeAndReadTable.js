@@ -12,10 +12,8 @@ const statusPlusCon = bos+'новый'+boc+'Новый'+boe+bos+'диагнос�
 
 let tableObject; let tableClient; 
 let tableWorker; let tableHuman;
-let i11 = ''; let i12 = '';
-let i21 = ''; let i22 = '';
-let i31 = ''; let i32 = '';
-let i41 = '';
+let i11 = ''; let i12 = '', i21 = ''; let i22 = '';
+let i31 = ''; let i32 = '', i41 = '';
 async function tableSpecialChek()
 {
 	i11 = i12 = i21 = i22 = i31 = i32 = i41 = bos+boc+'не указана'+boe;
@@ -222,5 +220,3 @@ document.getElementById('readTable').addEventListener('submit', async function (
 	document.getElementById('result').innerHTML = result1;
 	tableSpecialChek();
 });
-
-
