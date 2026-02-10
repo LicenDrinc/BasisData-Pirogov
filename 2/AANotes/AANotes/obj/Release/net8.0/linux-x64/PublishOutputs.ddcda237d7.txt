@@ -1,0 +1,4 @@
+C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\bin\Release\net8.0\linux-x64\publish\AANotes.pdb
+C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\bin\Release\net8.0\linux-x64\publish\libHarfBuzzSharp.so
+C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\bin\Release\net8.0\linux-x64\publish\libSkiaSharp.so
+C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\bin\Release\net8.0\linux-x64\publish\AANotes
