@@ -213,7 +213,6 @@ C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\bin\Debug\net8.0
 C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\bin\Debug\net8.0\win-x64\hostfxr.dll
 C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\bin\Debug\net8.0\win-x64\hostpolicy.dll
 C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\bin\Debug\net8.0\win-x64\mscordaccore.dll
-C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\bin\Debug\net8.0\win-x64\mscordaccore_amd64_amd64_8.0.2225.52707.dll
 C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\bin\Debug\net8.0\win-x64\mscordbi.dll
 C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\bin\Debug\net8.0\win-x64\mscorrc.dll
 C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\bin\Debug\net8.0\win-x64\msquic.dll
@@ -231,3 +230,7 @@ C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\obj\Debug\net8.0
 C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\obj\Debug\net8.0\win-x64\AANotes.pdb
 C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\obj\Debug\net8.0\win-x64\AANotes.genruntimeconfig.cache
 C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\obj\Debug\net8.0\win-x64\ref\AANotes.dll
+C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\bin\Debug\net8.0\win-x64\mscordaccore_amd64_amd64_8.0.2426.7010.dll
+C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\bin\Debug\net8.0\win-x64\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\bin\Debug\net8.0\win-x64\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\LicenDrinc\Desktop\BasisData-Pirogov\2\AANotes\AANotes\bin\Debug\net8.0\win-x64\Npgsql.dll

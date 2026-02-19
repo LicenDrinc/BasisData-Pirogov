@@ -7,48 +7,5 @@
 		x:Class="AANotes.MainWindow"
         Title="AANotes">
 
-	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="auto"/>
-			<RowDefinition Height="*"/>
-		</Grid.RowDefinitions>
-		<TextBox x:Name="Search" Grid.Row="0"
-				 FontSize="14" Margin="50,15,50,10" CornerRadius="10"
-				 Background="#242424" BorderBrush="#0088ff"
-				 Watermark="Поиск"/>
-		<UniformGrid Columns="4" Grid.Row="1" Margin="10,0,10,10">
-			<Rectangle Fill="#000033" Margin="5"/>
-			<Rectangle Fill="#000066" Margin="5"/>
-			<Rectangle Fill="#000099" Margin="5"/>
-			<Rectangle Fill="#0000cc" Margin="5"/>
-			<Rectangle Fill="#0000ff" Margin="5"/>
-			<Rectangle Fill="#0033ff" Margin="5"/>
-			<Rectangle Fill="#0066ff" Margin="5"/>
-			<Rectangle Fill="#0099ff" Margin="5"/>
-			<Rectangle Fill="#00ccff" Margin="5"/>
-			<Rectangle Fill="#00ffff" Margin="5"/>
-			<Rectangle Fill="#33ffff" Margin="5"/>
-			<Rectangle Fill="#66ffff" Margin="5"/>
-		</UniformGrid>
-	</Grid>
+	<ContentControl x:Name="MainContent"/>
 </Window>
-<!--
-<DockPanel>
-	<StackPanel DockPanel.Dock="Top"
-				Orientation="Horizontal"
-				Spacing="10" Margin="10">
-		<Button Content="Открыть" Click="OpenFile"/>
-		<Button Content="Сохранить" Click="SaveFile"/>
-	</StackPanel>
-	<TextBox x:Name="Editor"
-				AcceptsReturn="True"
-				TextWrapping="Wrap"
-				ScrollViewer.VerticalScrollBarVisibility="Disabled"
-				FontSize="14" Margin="10"/>
-</DockPanel>
-
-<StackPanel Spacing="10" Margin="10">
-	<TextBlock Text="Привет, хуй" FontSize="20"/>
-	<Button Content="ну давай" Click="OnClick"/>
-</StackPanel>
--->

@@ -30,3 +30,9 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
 [C:/Users/LicenDrinc/Desktop/BasisData-Pirogov/2/AANotes/AANotes/MainWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[C:/Users/LicenDrinc/Desktop/BasisData-Pirogov/2/AANotes/AANotes/Views/EditorView.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[C:/Users/LicenDrinc/Desktop/BasisData-Pirogov/2/AANotes/AANotes/Views/MainView.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

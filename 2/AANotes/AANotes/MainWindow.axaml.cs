@@ -1,56 +1,69 @@
+using AANotes.Views;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
-using Avalonia.Platform.Storage;
-using System.ComponentModel;
-using System.IO;
+using Npgsql;
+using System.Collections.Generic;
 
 namespace AANotes
 {
     public partial class MainWindow : Window
     {
+        private readonly string cs = "Host=localhost;Port=5432;Username=postgres;Password=123;Database=NotesLD";
+        public NpgsqlConnection conn = new();
+        public List<BDNotes> notesList = new();
+        public int indexBDNotes = 0;
+        public int indexListNotes = 0;
+
         public MainWindow()
         {
             InitializeComponent();
-        }
+            OpenBD();
 
-        /*
-        private async void OpenFile(object? sender, RoutedEventArgs e)
+            OpenMain();
+        }
+        public void OpenEditor() => MainContent.Content = new EditorView(this);
+        public void OpenMain() => MainContent.Content = new MainView(this);
+        public void OpenBD()
         {
-            var files = await this.StorageProvider.OpenFilePickerAsync(
-                new FilePickerOpenOptions
-                {
-                    Title = "Открыть файл",
-                    AllowMultiple = false
-                });
-
-            if (files.Count > 0)
-            {
-                await using var stream = await files[0].OpenReadAsync();
-                using var reader = new StreamReader(stream);
-                Editor.Text = await reader.ReadToEndAsync();
-            }
+            conn = new(cs); conn.Open(); ObdateBD();
         }
-
-        private async void SaveFile(object? sender, RoutedEventArgs e)
+        public void SaveBD()
         {
-            var file = await this.StorageProvider.SaveFilePickerAsync(
-                new FilePickerSaveOptions
-                {
-                    Title = "Сохранить файл"
-                });
-
-            if (file != null)
-            {
-                await using var stream = await file.OpenWriteAsync();
-                using var writer = new StreamWriter(stream);
-                await writer.WriteAsync(Editor.Text);
-            }
+            var sql = $"UPDATE note SET title = '{notesList[indexListNotes].Title}', text = '{notesList[indexListNotes].Text}' WHERE id = {notesList[indexListNotes].Id}";
+            using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.ExecuteNonQuery();
         }
-
-        public void OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        public void ObdateBD()
         {
-            Title = "дададададада";
+            notesList.Clear();
+
+            var sql = "SELECT * FROM note";
+
+            using var cmd = new NpgsqlCommand(sql, conn);
+            using var reader = cmd.ExecuteReader();
+
+            while (reader.Read()) notesList.Add(new(reader.GetInt32(0), reader.GetString(1), reader.GetString(2)));
         }
-        */
+        public void NewNote(string title, string text)
+        {
+            var sql = "INSERT INTO note (title, text) VALUES ('" + title + "', '" + text + "')";
+            using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.ExecuteNonQuery();
+        }
+        public void DeleteNote()
+        {
+            var sql = $"DELETE FROM note WHERE id = {indexBDNotes}";
+            using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.ExecuteNonQuery();
+        }
+
+        public class BDNotes
+        {
+            public int Id { get; set; }
+            public string Title { get; set; }
+            public string Text { get; set; }
+
+            public BDNotes(int i, string t, string x) { Id = i; Title = t; Text = x; }
+            public BDNotes() { Id = 0; Title = ""; Text = ""; }
+        }
     }
 }

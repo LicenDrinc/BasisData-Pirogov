@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AANotes.Views.MainView">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="Auto"/>
+		</Grid.ColumnDefinitions>
+		
+		<TextBox x:Name="Search" Watermark="Поиск" Height="30"
+				 Grid.Row="0" Grid.Column="0"
+				 Margin="30,15,10,10" FontSize="14" CornerRadius="10"
+				 Background="#242424" BorderBrush="#0088ff"/>
+		<Button Content="Новая" Click="OnNew" Height="30"
+				Grid.Row="0" Grid.Column="1"
+				Margin="10,15,30,10"/>
+
+		<ScrollViewer Grid.Row="1" Grid.ColumnSpan="2">
+			<WrapPanel x:Name="NotesContainer"
+					   Margin="10" HorizontalAlignment="Left"
+					   ItemWidth="185" ItemHeight="185"/>
+		</ScrollViewer>
+	</Grid>
+</UserControl>

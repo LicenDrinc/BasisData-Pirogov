@@ -1,0 +1,1 @@
+psql --host=localhost --username=postgres --password --file=ResBasisData
