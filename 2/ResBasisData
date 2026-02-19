@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict MiYXSbSFcLj9CDFv93PNZMioxsYHDJdFsueaNPdTEjxtszsrSX74fL17JhnEyPz
+\restrict ZkDqTlmcLuaNDdFv1cvCYJvxS7ZsKbGArsfwhTKwJVsUlujj7TD3iadquWBso7r
 
 -- Dumped from database version 16.10 (Ubuntu 16.10-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 16.10 (Ubuntu 16.10-0ubuntu0.24.04.1)
@@ -27,9 +27,9 @@ CREATE DATABASE "NotesLD" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PRO
 
 ALTER DATABASE "NotesLD" OWNER TO postgres;
 
-\unrestrict MiYXSbSFcLj9CDFv93PNZMioxsYHDJdFsueaNPdTEjxtszsrSX74fL17JhnEyPz
+\unrestrict ZkDqTlmcLuaNDdFv1cvCYJvxS7ZsKbGArsfwhTKwJVsUlujj7TD3iadquWBso7r
 \connect "NotesLD"
-\restrict MiYXSbSFcLj9CDFv93PNZMioxsYHDJdFsueaNPdTEjxtszsrSX74fL17JhnEyPz
+\restrict ZkDqTlmcLuaNDdFv1cvCYJvxS7ZsKbGArsfwhTKwJVsUlujj7TD3iadquWBso7r
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -93,6 +93,7 @@ ALTER TABLE ONLY public.note ALTER COLUMN id SET DEFAULT nextval('public.note_id
 --
 
 COPY public.note (id, title, text) FROM stdin;
+107	ТЕСТ	ДА
 \.
 
 
@@ -100,7 +101,7 @@ COPY public.note (id, title, text) FROM stdin;
 -- Name: note_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.note_id_seq', 106, true);
+SELECT pg_catalog.setval('public.note_id_seq', 107, true);
 
 
 --
@@ -115,5 +116,5 @@ ALTER TABLE ONLY public.note
 -- PostgreSQL database dump complete
 --
 
-\unrestrict MiYXSbSFcLj9CDFv93PNZMioxsYHDJdFsueaNPdTEjxtszsrSX74fL17JhnEyPz
+\unrestrict ZkDqTlmcLuaNDdFv1cvCYJvxS7ZsKbGArsfwhTKwJVsUlujj7TD3iadquWBso7r
 
