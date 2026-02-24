@@ -17,7 +17,7 @@ public partial class EditorView : UserControl
 
         if (_mainWindow.indexBDNotes == -1)
         {
-            //if (title.Text != "" || text.Text != "") 
+            if (title.Text != "" || text.Text != "") 
                 _mainWindow.NewNote(title.Text, text.Text);
         }
         else

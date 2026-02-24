@@ -1,16 +1,14 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fluent="clr-namespace:Avalonia.Themes.Fluent;assembly=Avalonia.Themes.Fluent"
              x:Class="AANotes.App"
-			 
-			 xmlns:fluent="clr-namespace:Avalonia.Themes.Fluent;assembly=Avalonia.Themes.Fluent"
-			 RequestedThemeVariant="Dark">
+             RequestedThemeVariant="Dark">
 
-	<!--
 	<Application.Styles>
-        <FluentTheme />
-    </Application.Styles>
-	-->
-	<Application.Styles>
-		<fluent:FluentTheme />
+		<FluentTheme>
+			<FluentTheme.Palettes>
+				<ColorPaletteResources x:Key="Dark" Accent="#171717" RegionColor="#171717" ErrorText="#ff0000" />
+			</FluentTheme.Palettes>
+		</FluentTheme>
 	</Application.Styles>
 </Application>

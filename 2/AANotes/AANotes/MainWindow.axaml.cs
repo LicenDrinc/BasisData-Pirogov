@@ -24,8 +24,54 @@ namespace AANotes
         public void OpenMain() => MainContent.Content = new MainView(this);
         public void OpenBD()
         {
-            conn = new(cs); conn.Open(); ObdateBD();
+            EnsureDatabaseExists();
+            conn = OpenMainDatabase(cs);
+            EnsureTables(conn);
+            // conn = new(cs); conn.Open();
+            ObdateBD();
         }
+        private static void EnsureDatabaseExists()
+        {
+            var adminCs = "Host=localhost;Port=5432;Username=postgres;Password=123;Database=postgres";
+            var targetDbName = "NotesLD";
+
+            using var conn = new NpgsqlConnection(adminCs);
+            conn.Open();
+
+            // проверяем, существует ли БД
+            using var checkCmd = new NpgsqlCommand("SELECT 1 FROM pg_database WHERE datname = @name", conn);
+            checkCmd.Parameters.AddWithValue("name", targetDbName);
+
+            var exists = checkCmd.ExecuteScalar() != null;
+
+            if (!exists)
+            {
+                using var createCmd = new NpgsqlCommand($"CREATE DATABASE \"{targetDbName}\"", conn);
+                createCmd.ExecuteNonQuery();
+            }
+        }
+        private static NpgsqlConnection OpenMainDatabase(string cs)
+        {
+            var conn = new NpgsqlConnection(cs);
+            conn.Open();
+            return conn;
+        }
+        private static void EnsureTables(NpgsqlConnection conn)
+        {
+            var sql = "CREATE TABLE IF NOT EXISTS note (id SERIAL PRIMARY KEY, title TEXT, text TEXT);";
+
+            using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.ExecuteNonQuery();
+        }
+        void EnsureColumnExists(NpgsqlConnection conn, string table, string column, string typeAndOptions)
+        {
+            var sql = $"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {column} {typeAndOptions};";
+
+            using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.ExecuteNonQuery();
+        }
+
+
         public void SaveBD()
         {
             var sql = $"UPDATE note SET title = '{notesList[indexListNotes].Title}', text = '{notesList[indexListNotes].Text}' WHERE id = {notesList[indexListNotes].Id}";
@@ -45,7 +91,7 @@ namespace AANotes
         }
         public void NewNote(string title, string text)
         {
-            var sql = "INSERT INTO note (title, text) VALUES ('" + title + "', '" + text + "')";
+            var sql = $"INSERT INTO note (title, text) VALUES ('{title}', {text}')";
             using var cmd = new NpgsqlCommand(sql, conn);
             cmd.ExecuteNonQuery();
         }

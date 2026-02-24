@@ -7,9 +7,9 @@
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 	 
         <!-- ВАЖНО ДЛЯ LINUX -->
-        <!---->
+        
         <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
-		<!---->
+		
         <SelfContained>true</SelfContained>
         <PublishSingleFile>true</PublishSingleFile>
 	  

@@ -65,7 +65,7 @@ public partial class MainView : UserControl
                         },
                         new TextBlock
                         {
-                            Text = ShortenTextByLines(note.Text, 5, 15), FontSize = 16,
+                            Text = ShortenTextByLines(note.Text, 6, 15), FontSize = 16,
                             Foreground = new SolidColorBrush(Color.Parse("#888888")),
                             TextWrapping = TextWrapping.Wrap
                         }
@@ -92,25 +92,23 @@ public partial class MainView : UserControl
         {
             if (ch == '\n')
             {
+                if (lines.Count > maxLines + 1) break;
                 lines.Add(currentLine.TrimStart()); currentLine = "";
-                if (lines.Count >= maxLines) break;
                 continue;
             }
-
             currentLine += ch;
-
             if (currentLine.Length >= charsPerLine)
             {
+                if (lines.Count > maxLines + 1) break;
                 lines.Add(currentLine.TrimStart()); currentLine = "";
-                if (lines.Count >= maxLines) break;
             }
         }
+        if (!string.IsNullOrEmpty(currentLine)) lines.Add(currentLine.TrimStart());
 
-        if (!string.IsNullOrEmpty(currentLine) && lines.Count < maxLines) lines.Add(currentLine.TrimStart());
-
-        int totalCharsInLines = lines.Sum(l => l.Length);
-        bool trimmed = lines.Count >= maxLines && text.Length > totalCharsInLines;
-        var result = string.Join("\n", lines);
+        var linesToShow = lines.Count > maxLines ? [.. lines.Take(maxLines - 1)] : lines;
+        int totalCharsInLines = linesToShow.Sum(l => l.Length);
+        bool trimmed = lines.Count > maxLines && text.Length > totalCharsInLines;
+        var result = string.Join("\n", linesToShow);
 
         return trimmed ? result + "\n..." : result;
     }
