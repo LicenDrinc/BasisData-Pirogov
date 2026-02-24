@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AANotes")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1aee3f66086a25867e236dc44a4000a67eaf58d5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+63c7ea99d9af0adbadda052ccb2a93635b505b74")]
 [assembly: System.Reflection.AssemblyProductAttribute("AANotes")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AANotes")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

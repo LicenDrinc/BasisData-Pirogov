@@ -91,7 +91,7 @@ namespace AANotes
         }
         public void NewNote(string title, string text)
         {
-            var sql = $"INSERT INTO note (title, text) VALUES ('{title}', {text}')";
+            var sql = $"INSERT INTO note (title, text) VALUES ('{title}', '{text}')";
             using var cmd = new NpgsqlCommand(sql, conn);
             cmd.ExecuteNonQuery();
         }
