@@ -23,11 +23,10 @@
 		<Button Content="Удалить" Click="OnDelete" Height="30"
 				Grid.Row="0" Grid.Column="2"
 				Margin="10,15,30,10"/>
-		
+
 		<TextBox Grid.Row="1" Grid.ColumnSpan="3"
-				 x:Name="text" Watermark="Тут ничего нет"
-				 AcceptsReturn="True"
-				 TextWrapping="Wrap"
+				 x:Name="Editor" Watermark="Тут ничего нет"
+				 AcceptsReturn="True" TextWrapping="Wrap"
 				 Margin="10" FontSize="14" CornerRadius="10"
 				 Background="#171717" BorderBrush="#171717"/>
 	</Grid>

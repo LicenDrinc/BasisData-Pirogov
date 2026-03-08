@@ -1,17 +1,23 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using static AANotes.MainWindow;
 namespace AANotes.Views;
 
 public partial class MainView : UserControl
 {
     private readonly MainWindow _mainWindow;
+    private string search;
+    public List<BDNotes> notesListSearch = [];
     public MainView(MainWindow mainWindow)
     {
         InitializeComponent();
         _mainWindow = mainWindow;
-        LoadNotes();
+        search = "";
+        LoadNotes(search);
     }
     private void OnOpenNote(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
@@ -23,20 +29,37 @@ public partial class MainView : UserControl
         _mainWindow.indexListNotes = -1;
         _mainWindow.OpenEditor();
     }
+    private void OnSearch(object? sender, TextChangedEventArgs e)
+    {
+        search = Search.Text ?? ""; LoadNotes(search);
+    }
 
-    private void LoadNotes()
+    private static bool Matches(string source, string search)
+    {
+        if (string.IsNullOrWhiteSpace(search)) return true;
+
+        source = source.ToLower();
+        var parts = search.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        return parts.All(p => source.Contains(p));
+    }
+    private void LoadNotes(string s)
     {
         NotesContainer.Children.Clear();
 
-        if (_mainWindow.notesList.Count == 0)
+        if (!string.IsNullOrWhiteSpace(s)) notesListSearch = [.. _mainWindow.notesList.Where(n => Matches($"{n.Title} {n.Text}", s))];
+        else notesListSearch = _mainWindow.notesList;
+
+        if (notesListSearch.Count == 0)
         {
             NotesContainer.ItemWidth = double.NaN; NotesContainer.ItemHeight = double.NaN;
             NotesContainer.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center;
             NotesContainer.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center;
             NotesContainer.Children.Add(new TextBlock
             {
-                Text = "Нету заметок. Нажмите на 'Новая' для создания новой заметки!",
-                FontSize = 16, Foreground = new SolidColorBrush(Color.Parse("#777777")),
+                Text = s != "" ? $"Ненайденный заметки по запросу \"{s}\"!" : "Нету заметок. Нажмите на 'Новая' для создания новой заметки!",
+                FontSize = 16,
+                Foreground = new SolidColorBrush(Color.Parse("#777777")),
                 HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
                 TextWrapping = TextWrapping.Wrap
@@ -44,33 +67,45 @@ public partial class MainView : UserControl
             return;
         }
 
-        foreach (var note in _mainWindow.notesList)
+        NotesContainer.ItemWidth = 185; NotesContainer.ItemHeight = 185;
+        NotesContainer.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left;
+        NotesContainer.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top;
+
+        foreach (var note in notesListSearch)
         {
+            var grid = new Grid { RowDefinitions = [ new RowDefinition(GridLength.Auto), new RowDefinition(GridLength.Star), new RowDefinition(GridLength.Auto) ] };
+
+            var titleBlock = new TextBlock
+            {
+                Text = note.Title, FontSize = 18,
+                Foreground = new SolidColorBrush(Color.Parse("#ffffff")),
+                TextWrapping = TextWrapping.Wrap,
+                FontWeight = FontWeight.Bold
+            };
+
+            var mainTextBlock = new TextBlock
+            {
+                Text = ShortenTextByLines(note.Text, 5, 15), FontSize = 16,
+                Foreground = new SolidColorBrush(Color.Parse("#888888")),
+                TextWrapping = TextWrapping.Wrap
+            };
+
+            var timeBlock = new TextBlock
+            {
+                Text = ToHumanTime(note.TimeEditor), FontSize = 12,
+                Foreground = new SolidColorBrush(Color.Parse("#888888")),
+                TextWrapping = TextWrapping.Wrap
+            };
+
+            Grid.SetRow(titleBlock, 0); Grid.SetRow(mainTextBlock, 1); Grid.SetRow(timeBlock, 2);
+            grid.Children.Add(titleBlock); grid.Children.Add(mainTextBlock); grid.Children.Add(timeBlock);
+
             var tile = new Border
             {
                 Width = 170, Height = 170,
                 Margin = new(10), CornerRadius = new(10), Padding = new(10),
                 Background = new SolidColorBrush(Color.Parse("#252525")),
-                Child = new StackPanel
-                {
-                    Spacing = 5,
-                    Children =
-                    {
-                        new TextBlock
-                        {
-                            Text = note.Title, FontSize = 18,
-                            Foreground = new SolidColorBrush(Color.Parse("#ffffff")),
-                            TextWrapping = TextWrapping.Wrap,
-                            FontWeight = FontWeight.Bold
-                        },
-                        new TextBlock
-                        {
-                            Text = ShortenTextByLines(note.Text, 6, 15), FontSize = 16,
-                            Foreground = new SolidColorBrush(Color.Parse("#888888")),
-                            TextWrapping = TextWrapping.Wrap
-                        }
-                    }
-                }
+                Child = grid
             };
             tile.PointerPressed += (_, _) =>
             {
@@ -111,5 +146,17 @@ public partial class MainView : UserControl
         var result = string.Join("\n", linesToShow);
 
         return trimmed ? result + "\n..." : result;
+    }
+
+    private static string ToHumanTime(DateTime dt)
+    {
+        var span = DateTime.Now - dt;
+
+        if (span.TotalMinutes < 1) return "только что";
+        if (span.TotalMinutes < 60) return $"{(int)span.TotalMinutes} мин назад";
+        if (span.TotalHours < 24) return $"{(int)span.TotalHours} ч назад";
+        if (span.TotalDays < 7) return $"{(int)span.TotalDays} д назад";
+
+        return dt.ToString("dd.MM.yyyy");
     }
 }
