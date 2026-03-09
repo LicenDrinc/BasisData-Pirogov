@@ -13,11 +13,11 @@
 		
 		<TextBox x:Name="Search" Watermark="Поиск" Height="30"
 				 Grid.Row="0" Grid.Column="0" TextChanged="OnSearch"
-				 Margin="30,15,10,10" FontSize="14" CornerRadius="10"
+				 Margin="20,15,5,10" FontSize="14" CornerRadius="10"
 				 Background="#242424" BorderBrush="#0088ff"/>
 		<Button Content="Новая" Click="OnNew" Height="30"
 				Grid.Row="0" Grid.Column="1"
-				Margin="10,15,30,10"/>
+				Margin="5,15,20,10"/>
 
 		<ScrollViewer Grid.Row="1" Grid.ColumnSpan="2">
 			<WrapPanel x:Name="NotesContainer" Margin="10"/>
