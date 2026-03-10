@@ -4,7 +4,9 @@ using Avalonia.Media;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using static AANotes.MainWindow;
+
 namespace AANotes.Views;
 
 public partial class MainView : UserControl

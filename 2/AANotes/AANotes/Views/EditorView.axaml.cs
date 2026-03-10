@@ -1,4 +1,5 @@
-﻿using Avalonia;
+﻿using AANotes.Windows;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using System.Collections.Generic;
@@ -32,16 +33,28 @@ public partial class EditorView : UserControl
     {
 
     }
-    private void OnNewLinkNote(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void OnNewLinkNote(object? sender, Avalonia.Interactivity.RoutedEventArgs e) { AddLinkNote(); }
+    private void OnNewLinkHttp(object? sender, Avalonia.Interactivity.RoutedEventArgs e) { AddLinkHttp(); }
+
+    private async void AddLinkNote()
     {
-
+        var dialog = new AddLinkNoteWindows(_mainWindow);
+        var result = await dialog.ShowDialog<int?>((Window)VisualRoot);
+        if (result.HasValue && result.Value >= 0)
+        {
+            Editor.Text += result.Value;
+        }
     }
-    private void OnNewLinkHttp(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private async void AddLinkHttp()
     {
-
+        var dialog = new AddLinkHttpWindows();
+        var result = await dialog.ShowDialog<string?>((Window)VisualRoot);
+        if (!string.IsNullOrWhiteSpace(result))
+        {
+            if (!result.StartsWith("http")) return;
+            Editor.Text += result;
+        }
     }
-
-
     private void OpenLink(int i)
     {
         var link = _mainWindow.linksList[i];
