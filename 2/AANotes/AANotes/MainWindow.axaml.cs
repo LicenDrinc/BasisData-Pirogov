@@ -10,12 +10,14 @@ namespace AANotes
     {
         private readonly string cs = "Host=localhost;Port=5432;Username=postgres;Password=123;Database=NotesLD";
         private static readonly string[] sqlCreate = [
-            "note (id SERIAL PRIMARY KEY, title TEXT, text TEXT);",
-            "links_in_note (id SERIAL PRIMARY KEY, id_note INT REFERENCES note(id) ON DELETE CASCADE, link_out TEXT)"
+            "note (id SERIAL PRIMARY KEY, title TEXT, text TEXT, time_editor TIMESTAMP NOT NULL DEFAULT now());",
+            "links_in_note (id SERIAL PRIMARY KEY, id_note INT, link_out TEXT)"
             ];
         public NpgsqlConnection conn = new();
         public List<BDNotes> notesList = new();
         public List<BDLinks> linksList = new();
+        public List<int> notesJurnal = new();
+        public List<int> notesSort = new();
         public int indexBDNotes = 0;
         public int indexListNotes = 0;
         public int indexBDLinks = 0;
@@ -25,7 +27,7 @@ namespace AANotes
         {
             InitializeComponent();
             OpenBD();
-
+            notesJurnal.Clear();
             OpenMain();
         }
         public void OpenEditor() => MainContent.Content = new EditorView(this);
@@ -35,8 +37,7 @@ namespace AANotes
             EnsureDatabaseExists();
             conn = OpenMainDatabase(cs);
             EnsureTables(conn);
-            EnsureColumnExists(conn, "note", "time_editor", "TIMESTAMP NOT NULL DEFAULT now()");
-            ObdateNote(); ObdateLinks();
+            UbdateNote(); UbdateLinks();
         }
         private static void EnsureDatabaseExists()
         {
@@ -62,14 +63,12 @@ namespace AANotes
         private static void EnsureColumnExists(NpgsqlConnection conn, string table, string column, string typeAndOptions)
         {
             var sql = $"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {column} {typeAndOptions};";
-            using var cmd = new NpgsqlCommand(sql, conn);
-            cmd.ExecuteNonQuery();
+            using var cmd = new NpgsqlCommand(sql, conn); cmd.ExecuteNonQuery();
         }
         public bool TableExists(string tableName)
         {
             string sql = "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = @name)";
-            using var cmd = new NpgsqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@name", tableName);
+            using var cmd = new NpgsqlCommand(sql, conn); cmd.Parameters.AddWithValue("@name", tableName);
             return (bool)cmd.ExecuteScalar();
         }
 
@@ -84,11 +83,23 @@ namespace AANotes
             cmd.Parameters.AddWithValue("@id", note.Id);
             cmd.ExecuteNonQuery();
         }
-        public void ObdateNote()
+        public void UbdateNote()
         {
-            notesList.Clear(); var sql = "SELECT * FROM note";
+            notesList.Clear(); var sql = "SELECT * FROM note"; List<BDNotes> notesListDemo = new();
             using var cmd = new NpgsqlCommand(sql, conn); using var reader = cmd.ExecuteReader();
-            while (reader.Read()) notesList.Add(new(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetDateTime(3)));
+            while (reader.Read()) notesListDemo.Add(new(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetDateTime(3)));
+            notesSort.Clear();
+            while (notesSort.Count < notesListDemo.Count)
+            {
+                int l = 0;
+                for (int i = 0; i < notesListDemo.Count; i++)
+                {
+                    int k = 0; for (int j = 0; j < notesSort.Count; j++) { if (i == notesSort[j]) break; k++; }
+                    if (k == notesSort.Count) { if (notesListDemo[i].TimeEditor >= notesListDemo[l].TimeEditor) l = i; }
+                }
+                notesSort.Add(l);
+            }
+            for (int i = 0; i < notesSort.Count; i++) notesList.Add(notesListDemo[notesSort[i]]);
         }
         public void NewNote(string title, string text)
         {
@@ -114,7 +125,7 @@ namespace AANotes
             cmd.Parameters.AddWithValue("@id", links.Id);
             cmd.ExecuteNonQuery();
         }
-        public void ObdateLinks()
+        public void UbdateLinks()
         {
             linksList.Clear(); var sql = "SELECT * FROM links_in_note";
             using var cmd = new NpgsqlCommand(sql, conn); using var reader = cmd.ExecuteReader();

@@ -73,6 +73,7 @@ public partial class MainView : UserControl
         NotesContainer.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left;
         NotesContainer.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top;
 
+        //for (int i = 0; i < _mainWindow.notesSort.Count; i++)
         foreach (var note in notesListSearch)
         {
             var grid = new Grid { RowDefinitions = [ new RowDefinition(GridLength.Auto), new RowDefinition(GridLength.Star), new RowDefinition(GridLength.Auto) ] };
@@ -95,7 +96,7 @@ public partial class MainView : UserControl
             var timeBlock = new TextBlock
             {
                 Text = ToHumanTime(note.TimeEditor), FontSize = 12,
-                Foreground = new SolidColorBrush(Color.Parse("#888888")),
+                Foreground = new SolidColorBrush(Color.Parse("#666666")),
                 TextWrapping = TextWrapping.Wrap
             };
 

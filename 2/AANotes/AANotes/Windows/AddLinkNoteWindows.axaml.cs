@@ -27,7 +27,7 @@ public partial class AddLinkNoteWindows : Window
     {
         for (int i = 0; i < _mainWindow.notesList.Count; i++)
         {
-            var note = new ComboBoxItem { Tag = i, Content = _mainWindow.notesList[i].Title };
+            var note = new ComboBoxItem { Tag = _mainWindow.notesList[i].Id, Content = _mainWindow.notesList[i].Title };
             NotesCB.Items.Add(note);
         }
     }
