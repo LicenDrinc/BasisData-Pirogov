@@ -1,7 +1,9 @@
 ﻿using AANotes.Windows;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Threading;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -27,7 +29,7 @@ public partial class EditorView : UserControl
         {
             if (title.Text != "" || Editor.Text != "")
             {
-                _mainWindow.NewNote(title.Text, Editor.Text); _mainWindow.UbdateNote();
+                _mainWindow.NewNote(title.Text, Editor.Text); _mainWindow.UpdateNote();
                 int maxI = 0; var MNL = _mainWindow.notesList; var links = _mainWindow.linksList;
                 for (int i = 0; i < MNL.Count; i++) { if (MNL[i].Id > maxI) maxI = MNL[i].Id; }
                 for (int i = 0; i < links.Count; i++) { if (links[i].IdNote == -1) _mainWindow.NewLinks(maxI, links[i].Link); }
@@ -38,7 +40,7 @@ public partial class EditorView : UserControl
             _mainWindow.notesList[iBDN].Title = title.Text; _mainWindow.notesList[iBDN].Text = Editor.Text;
             _mainWindow.SaveNote();
         }
-        _mainWindow.UbdateNote(); _mainWindow.UbdateLinks();
+        _mainWindow.UpdateNote(); _mainWindow.UpdateLinks();
         if (_mainWindow.notesJurnal.Count == 0) _mainWindow.OpenMain();
         else
         {
@@ -64,12 +66,31 @@ public partial class EditorView : UserControl
                 }
             }
         }
-        _mainWindow.DeleteNote(); _mainWindow.UbdateNote(); _mainWindow.UbdateLinks(); _mainWindow.OpenMain();
+        _mainWindow.DeleteNote(); _mainWindow.UpdateNote(); _mainWindow.UpdateLinks(); _mainWindow.OpenMain();
     }
+    private void Editor_PointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (sender is not TextBox tb) return;
+
+        if ((e.KeyModifiers & KeyModifiers.Control) != 0)
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                int caret = tb.CaretIndex; string word = GetWordAt(tb.Text ?? "", caret);
+
+                if (!string.IsNullOrEmpty(word) && word.Length > 2 && word.StartsWith("{") && word.EndsWith("}"))
+                {
+                    if (int.TryParse(word[1..^1], out int idLink)) { if (!(idLink < 1 || idLink > linksId.Count)) OpenLink(linksId[idLink - 1]); }
+                }
+                else if (word.StartsWith("http://") || word.StartsWith("https://")) Process.Start(new ProcessStartInfo { FileName = word, UseShellExecute = true });
+            });
+        }
+    }
+
     private void OnDeleteLink(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         var iBDN = _mainWindow.indexBDNotes; var links = _mainWindow.linksList;
-        if (iBDN != -1) { if (_mainWindow.indexListLinks >= 0) _mainWindow.DeleteLinks(); _mainWindow.UbdateLinks(); }
+        if (iBDN != -1) { if (_mainWindow.indexListLinks >= 0) _mainWindow.DeleteLinks(); _mainWindow.UpdateLinks(); }
         else { if (_mainWindow.indexListLinks >= 0) links.RemoveAt(_mainWindow.indexListLinks); }
         linksId.Clear(); for (int i = 0; i < links.Count; i++) { if (links[i].IdNote == iBDN) linksId.Add(i); }
         ViewLinks();
@@ -77,6 +98,18 @@ public partial class EditorView : UserControl
     private void OnNewLinkNote(object? sender, Avalonia.Interactivity.RoutedEventArgs e) { AddLinkNote(); }
     private void OnNewLinkHttp(object? sender, Avalonia.Interactivity.RoutedEventArgs e) { AddLinkHttp(); }
 
+
+    private static string GetWordAt(string text, int index)
+    {
+        if (string.IsNullOrEmpty(text) || index >= text.Length) return "";
+
+        int start = index; int end = index;
+
+        while (start > 0 && !char.IsWhiteSpace(text[start - 1])) start--;
+        while (end < text.Length && !char.IsWhiteSpace(text[end])) end++;
+
+        return text[start..end];
+    }
     private async void AddLinkNote()
     {
         var dialog = new AddLinkNoteWindows(_mainWindow); var result = await dialog.ShowDialog<int?>((Window)VisualRoot);
@@ -84,9 +117,9 @@ public partial class EditorView : UserControl
         {
             var iBDN = _mainWindow.indexBDNotes; var links = _mainWindow.linksList;
             if (iBDN == -1) links.Add(new(-1, -1, result.Value.ToString()));
-            else { _mainWindow.NewLinks(_mainWindow.indexBDNotes, result.Value.ToString()); _mainWindow.UbdateLinks(); }
+            else { _mainWindow.NewLinks(_mainWindow.indexBDNotes, result.Value.ToString()); _mainWindow.UpdateLinks(); }
             linksId.Clear(); for (int i = 0; i < links.Count; i++) { if (links[i].IdNote == iBDN) linksId.Add(i); }
-            ViewLinks();
+            ViewLinks(); Editor.Text += " {" + linksId.Count + "}";
         }
     }
     private async void AddLinkHttp()
@@ -94,28 +127,28 @@ public partial class EditorView : UserControl
         var dialog = new AddLinkHttpWindows(); var result = await dialog.ShowDialog<string?>((Window)VisualRoot);
         if (!string.IsNullOrWhiteSpace(result))
         {
-            //if (!result.StartsWith("http")) return;
             var iBDN = _mainWindow.indexBDNotes; var links = _mainWindow.linksList;
             if (iBDN == -1) links.Add(new(-1, -1, result));
-            else { _mainWindow.NewLinks(_mainWindow.indexBDNotes, result); _mainWindow.UbdateLinks(); }
+            else { _mainWindow.NewLinks(_mainWindow.indexBDNotes, result); _mainWindow.UpdateLinks(); }
             linksId.Clear(); for (int i = 0; i < links.Count; i++) { if (links[i].IdNote == iBDN) linksId.Add(i); }
-            ViewLinks();
+            ViewLinks(); Editor.Text += " {" + linksId.Count + "}";
         }
     }
     private void OpenLink(int i)
     {
+        if (i < 0 || i > _mainWindow.linksList.Count) return;
         var link = _mainWindow.linksList[i];
         if (int.TryParse(link.Link, out int idNote))
         {
             var note = _mainWindow.notesList;
             for (int j = 0; j < note.Count; j++) 
             { 
-                if (note[j].Id == idNote) 
+                if (note[j].Id == idNote)
                 {
                     int maxI = 0; var iBDN = _mainWindow.indexListNotes; title.Text ??= ""; Editor.Text ??= "";
                     if (iBDN == -1)
                     {
-                        _mainWindow.NewNote(title.Text, Editor.Text); _mainWindow.UbdateNote();
+                        _mainWindow.NewNote(title.Text, Editor.Text); _mainWindow.UpdateNote();
                         var MNL = _mainWindow.notesList; var links = _mainWindow.linksList;
                         for (int t = 0; t < MNL.Count; t++) { if (MNL[t].Id > maxI) maxI = MNL[t].Id; }
                         for (int t = 0; t < links.Count; t++) { if (links[t].IdNote == -1) _mainWindow.NewLinks(maxI, links[t].Link); }
@@ -125,7 +158,7 @@ public partial class EditorView : UserControl
                         _mainWindow.notesList[iBDN].Title = title.Text; _mainWindow.notesList[iBDN].Text = Editor.Text;
                         maxI = _mainWindow.notesList[iBDN].Id; _mainWindow.SaveNote();
                     }
-                    _mainWindow.UbdateNote(); _mainWindow.UbdateLinks();
+                    _mainWindow.UpdateNote(); _mainWindow.UpdateLinks();
                     _mainWindow.notesJurnal.Add(maxI);
                     _mainWindow.indexListNotes = j; _mainWindow.indexBDNotes = note[j].Id;
                     _mainWindow.OpenEditor();

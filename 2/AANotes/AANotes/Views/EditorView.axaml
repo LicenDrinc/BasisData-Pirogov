@@ -28,6 +28,7 @@
 
 		<TextBox Grid.Row="1" Grid.ColumnSpan="3"
 				 x:Name="Editor" Watermark="Тут ничего нет"
+			     PointerReleased="Editor_PointerReleased"
 				 AcceptsReturn="True" TextWrapping="Wrap"
 				 Margin="10" FontSize="14" CornerRadius="10"
 				 Background="#171717" BorderBrush="#171717"/>

@@ -3,25 +3,27 @@ using Avalonia.Controls;
 using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace AANotes
 {
     public partial class MainWindow : Window
     {
-        private readonly string cs = "Host=localhost;Port=5432;Username=postgres;Password=123;Database=NotesLD";
+        private static readonly string targetDbName = "NotesLD";
+        private static readonly string adminCs = "Host=localhost;Port=5432;Username=postgres;Password=123;Database=postgres";
+        private static readonly string cs = "Host=localhost;Port=5432;Username=postgres;Password=123;Database=NotesLD";
         private static readonly string[] sqlCreate = [
             "note (id SERIAL PRIMARY KEY, title TEXT, text TEXT, time_editor TIMESTAMP NOT NULL DEFAULT now());",
             "links_in_note (id SERIAL PRIMARY KEY, id_note INT, link_out TEXT)"
             ];
         public NpgsqlConnection conn = new();
-        public List<BDNotes> notesList = new();
-        public List<BDLinks> linksList = new();
-        public List<int> notesJurnal = new();
-        public List<int> notesSort = new();
-        public int indexBDNotes = 0;
-        public int indexListNotes = 0;
-        public int indexBDLinks = 0;
-        public int indexListLinks = 0;
+        public List<BDNotes> notesList = new(); public List<BDLinks> linksList = new();
+        public List<int> notesJurnal = new();   public List<int> notesSort = new();
+        public int indexBDNotes = 0; public int indexListNotes = 0;
+        public int indexBDLinks = 0; public int indexListLinks = 0;
 
         public MainWindow()
         {
@@ -37,13 +39,10 @@ namespace AANotes
             EnsureDatabaseExists();
             conn = OpenMainDatabase(cs);
             EnsureTables(conn);
-            UbdateNote(); UbdateLinks();
+            UpdateNote(); UpdateLinks();
         }
         private static void EnsureDatabaseExists()
         {
-            var adminCs = "Host=localhost;Port=5432;Username=postgres;Password=123;Database=postgres";
-            var targetDbName = "NotesLD";
-
             using var conn = new NpgsqlConnection(adminCs); conn.Open();
 
             using var checkCmd = new NpgsqlCommand("SELECT 1 FROM pg_database WHERE datname = @name", conn);
@@ -71,6 +70,37 @@ namespace AANotes
             using var cmd = new NpgsqlCommand(sql, conn); cmd.Parameters.AddWithValue("@name", tableName);
             return (bool)cmd.ExecuteScalar();
         }
+        public void SaveToFile(string path)
+        {
+            var json = JsonSerializer.Serialize(new BDBackup(notesList, linksList), new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(path, json);
+        }
+        public void LoadFromFile(string path)
+        {
+            if (!File.Exists(path)) return;
+            var json = File.ReadAllText(path); var db = JsonSerializer.Deserialize<BDBackup>(json) ?? new BDBackup();
+
+            notesList = db.notes; linksList = db.links; DropDatabase(); OpenBD();
+            for (int i = 0; i < notesList.Count; i++) NewNote(notesList[i].Id, notesList[i].Title, notesList[i].Text, notesList[i].TimeEditor);
+            for (int i = 0; i < linksList.Count; i++) NewLinks(linksList[i].Id, linksList[i].IdNote, linksList[i].Link);
+            UpdateNote(); UpdateLinks(); notesJurnal.Clear(); OpenMain();
+        }
+        public static void DropDatabase()
+        {
+            using var conn = new NpgsqlConnection(adminCs); conn.Open();
+            var sql = $"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{targetDbName}' AND pid <> pg_backend_pid(); DROP DATABASE IF EXISTS {targetDbName};";
+            using var cmd = new NpgsqlCommand(sql, conn); cmd.ExecuteNonQuery();
+        }
+        public async Task<string?> OpenFile()
+        {
+            var dialog = new OpenFileDialog { Title = "Выбери файл", AllowMultiple = false, Filters = { new FileDialogFilter { Name = "JSON", Extensions = { "json" } } } };
+            var result = await dialog.ShowAsync((Window)VisualRoot); return result?.FirstOrDefault();
+        }
+        public async Task<string?> SaveFile()
+        {
+            var dialog = new SaveFileDialog { Title = "Сохранить файл", DefaultExtension = "json", Filters = { new FileDialogFilter { Name = "JSON", Extensions = { "json" } } } };
+            return await dialog.ShowAsync((Window)VisualRoot);
+        }
 
 
         public void SaveNote()
@@ -83,7 +113,7 @@ namespace AANotes
             cmd.Parameters.AddWithValue("@id", note.Id);
             cmd.ExecuteNonQuery();
         }
-        public void UbdateNote()
+        public void UpdateNote()
         {
             notesList.Clear(); var sql = "SELECT * FROM note"; List<BDNotes> notesListDemo = new();
             using var cmd = new NpgsqlCommand(sql, conn); using var reader = cmd.ExecuteReader();
@@ -91,11 +121,11 @@ namespace AANotes
             notesSort.Clear();
             while (notesSort.Count < notesListDemo.Count)
             {
-                int l = 0;
+                int l = 0; bool l1 = false;
                 for (int i = 0; i < notesListDemo.Count; i++)
                 {
-                    int k = 0; for (int j = 0; j < notesSort.Count; j++) { if (i == notesSort[j]) break; k++; }
-                    if (k == notesSort.Count) { if (notesListDemo[i].TimeEditor >= notesListDemo[l].TimeEditor) l = i; }
+                    int k = 0; for (int j = 0; j < notesSort.Count; j++) {if (i == notesSort[j]) break; k++; }
+                    if (k == notesSort.Count) { if (notesListDemo[i].TimeEditor >= notesListDemo[l].TimeEditor) { l = i; l1 = true; } } else if (!l1) l++;
                 }
                 notesSort.Add(l);
             }
@@ -107,6 +137,25 @@ namespace AANotes
             using var cmd = new NpgsqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@title", title);
             cmd.Parameters.AddWithValue("@text", text);
+            cmd.ExecuteScalar();
+        }
+        public void NewNote(string title, string text, DateTime time)
+        {
+            const string sql = "INSERT INTO note (title, text, time_editor) VALUES (@title, @text, @time)";
+            using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@title", title);
+            cmd.Parameters.AddWithValue("@text", text);
+            cmd.Parameters.AddWithValue("@text", time);
+            cmd.ExecuteScalar();
+        }
+        public void NewNote(int id, string title, string text, DateTime time)
+        {
+            const string sql = "INSERT INTO note (id, title, text, time_editor) VALUES (@id, @title, @text, @time)";
+            using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@id", id);
+            cmd.Parameters.AddWithValue("@title", title);
+            cmd.Parameters.AddWithValue("@text", text);
+            cmd.Parameters.AddWithValue("@text", time);
             cmd.ExecuteScalar();
         }
         public void DeleteNote()
@@ -125,7 +174,7 @@ namespace AANotes
             cmd.Parameters.AddWithValue("@id", links.Id);
             cmd.ExecuteNonQuery();
         }
-        public void UbdateLinks()
+        public void UpdateLinks()
         {
             linksList.Clear(); var sql = "SELECT * FROM links_in_note";
             using var cmd = new NpgsqlCommand(sql, conn); using var reader = cmd.ExecuteReader();
@@ -135,6 +184,15 @@ namespace AANotes
         {
             const string sql = "INSERT INTO links_in_note (id_note, link_out) VALUES (@id_note, @link_out)";
             using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@id_note", idNote);
+            cmd.Parameters.AddWithValue("@link_out", link);
+            cmd.ExecuteScalar();
+        }
+        public void NewLinks(int id, int idNote, string link)
+        {
+            const string sql = "INSERT INTO links_in_note (id, id_note, link_out) VALUES (@id, @id_note, @link_out)";
+            using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@id", id);
             cmd.Parameters.AddWithValue("@id_note", idNote);
             cmd.Parameters.AddWithValue("@link_out", link);
             cmd.ExecuteScalar();
@@ -164,6 +222,15 @@ namespace AANotes
 
             public BDLinks(int i, int n, string l) { Id = i; IdNote = n; Link = l; }
             public BDLinks() { Id = 0; IdNote = 0; Link = ""; }
+        }
+
+        public class BDBackup
+        {
+            public List<BDNotes> notes;
+            public List<BDLinks> links;
+
+            public BDBackup(List<BDNotes> n, List<BDLinks> l) { notes = n; links = l; }
+            public BDBackup() { notes = new(); links = new(); }
         }
     }
 }
