@@ -89,7 +89,8 @@ namespace AANotes
         public static void DropDatabase()
         {
             using var conn = new NpgsqlConnection(adminCs1); conn.Open();
-            var sql = $"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{targetDbName}' AND pid <> pg_backend_pid(); DROP DATABASE IF EXISTS {targetDbName};";
+            //var sql = $"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{targetDbName}' AND pid <> pg_backend_pid(); DROP DATABASE IF EXISTS {targetDbName};";
+            var sql = $"DROP DATABASE IF EXISTS {targetDbName};";
             using var cmd = new NpgsqlCommand(sql, conn); cmd.ExecuteNonQuery();
         }
         public async Task<string?> OpenFile()
