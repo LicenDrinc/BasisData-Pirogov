@@ -1,0 +1,200 @@
+--
+-- PostgreSQL database dump
+--
+
+\restrict ddo3V50sjbKgtl4rOXFf7YEAeD7g7zfZs4iggb24OMkZF97H5ViChdj69BtRLZr
+
+-- Dumped from database version 16.13 (Ubuntu 16.13-0ubuntu0.24.04.1)
+-- Dumped by pg_dump version 16.13 (Ubuntu 16.13-0ubuntu0.24.04.1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: NotesLD; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE "NotesLD" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'C.UTF-8';
+
+
+ALTER DATABASE "NotesLD" OWNER TO postgres;
+
+\unrestrict ddo3V50sjbKgtl4rOXFf7YEAeD7g7zfZs4iggb24OMkZF97H5ViChdj69BtRLZr
+\connect "NotesLD"
+\restrict ddo3V50sjbKgtl4rOXFf7YEAeD7g7zfZs4iggb24OMkZF97H5ViChdj69BtRLZr
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: links_in_note; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.links_in_note (
+    id integer NOT NULL,
+    id_note integer,
+    link_out text
+);
+
+
+ALTER TABLE public.links_in_note OWNER TO postgres;
+
+--
+-- Name: links_in_note_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.links_in_note_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.links_in_note_id_seq OWNER TO postgres;
+
+--
+-- Name: links_in_note_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.links_in_note_id_seq OWNED BY public.links_in_note.id;
+
+
+--
+-- Name: note; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.note (
+    id integer NOT NULL,
+    title text,
+    text text,
+    time_editor timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.note OWNER TO postgres;
+
+--
+-- Name: note_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.note_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.note_id_seq OWNER TO postgres;
+
+--
+-- Name: note_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.note_id_seq OWNED BY public.note.id;
+
+
+--
+-- Name: links_in_note id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.links_in_note ALTER COLUMN id SET DEFAULT nextval('public.links_in_note_id_seq'::regclass);
+
+
+--
+-- Name: note id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.note ALTER COLUMN id SET DEFAULT nextval('public.note_id_seq'::regclass);
+
+
+--
+-- Data for Name: links_in_note; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.links_in_note (id, id_note, link_out) FROM stdin;
+7	17	1
+8	18	17
+9	18	https://www.twitch.tv/
+12	17	9
+\.
+
+
+--
+-- Data for Name: note; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.note (id, title, text, time_editor) FROM stdin;
+6	текст 6	да\r\nда\r\nда\r\nда\r\nда\r\nда\r\nда	2026-03-26 11:59:44.030244
+11	тест на время	да	2026-03-02 10:43:18.581521
+12	тест на время 2	да\r\nда	2026-03-02 10:47:12.462844
+4	тест 4	да\r\nда\r\nда\r\nда\r\nда	2026-03-26 12:45:00.410478
+18	тест на ссылки 2	{2} {1} https://music.youtube.com/ {3} {0}	2026-04-01 09:05:27.342549
+17	тест на ссылки	{1} {2}	2026-04-01 09:06:46.249492
+9	тест на поиск	зачем\r\nнет	2026-04-01 09:06:51.364098
+1	тест 1.1	да\r\nда\r\nда	2026-04-01 09:06:53.846922
+2	тест 2	да\r\nда	2026-03-18 09:25:44.419053
+3	тест 3	да\r\nда\r\nда\r\nда	2026-03-18 09:26:01.073725
+5	тест 5	да\r\nда\r\nда\r\nда\r\nда\r\nда	2026-03-18 09:29:11.324644
+\.
+
+
+--
+-- Name: links_in_note_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.links_in_note_id_seq', 12, true);
+
+
+--
+-- Name: note_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.note_id_seq', 18, true);
+
+
+--
+-- Name: links_in_note links_in_note_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.links_in_note
+    ADD CONSTRAINT links_in_note_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: note note_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.note
+    ADD CONSTRAINT note_pkey PRIMARY KEY (id);
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+\unrestrict ddo3V50sjbKgtl4rOXFf7YEAeD7g7zfZs4iggb24OMkZF97H5ViChdj69BtRLZr
+
