@@ -81,7 +81,7 @@ namespace AANotes
             if (!File.Exists(path)) return;
             var json = File.ReadAllText(path); var db = JsonSerializer.Deserialize<BDBackup>(json) ?? new BDBackup();
 
-            notesList = db.notes; linksList = db.links; DropDatabase(); OpenBD();
+            notesList = db.Notes; linksList = db.Links; DropDatabase(); OpenBD();
             for (int i = 0; i < notesList.Count; i++) NewNote(notesList[i].Id, notesList[i].Title, notesList[i].Text, notesList[i].TimeEditor);
             for (int i = 0; i < linksList.Count; i++) NewLinks(linksList[i].Id, linksList[i].IdNote, linksList[i].Link);
             UpdateNote(); UpdateLinks(); notesJurnal.Clear(); OpenMain();
@@ -228,11 +228,11 @@ namespace AANotes
 
         public class BDBackup
         {
-            public List<BDNotes> notes;
-            public List<BDLinks> links;
+            public List<BDNotes> Notes { get; set; }
+            public List<BDLinks> Links { get; set; }
 
-            public BDBackup(List<BDNotes> n, List<BDLinks> l) { notes = n; links = l; }
-            public BDBackup() { notes = new(); links = new(); }
+            public BDBackup(List<BDNotes> n, List<BDLinks> l) { Notes = n; Links = l; }
+            public BDBackup() { Notes = new(); Links = new(); }
         }
     }
 }
