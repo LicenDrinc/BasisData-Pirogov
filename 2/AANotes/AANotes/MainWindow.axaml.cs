@@ -87,7 +87,7 @@ namespace AANotes
             for (int i = 0; i < notesList.Count; i++) sql1 += notesList[i].Id + "\t" + notesList[i].Title + "\t" + notesList[i].Text + "\t" + notesList[i].TimeEditor + "\n";
             for (int i = 0; i < linksList.Count; i++) sql2 += linksList[i].Id + "\t" + linksList[i].IdNote + "\t" + linksList[i].Link + "\n";
             sql1 += "\\."; sql2 += "\\."; var sql = sql1 + "\n" + sql2;
-            Console.WriteLine(sql);
+            Console.WriteLine(sql); Console.WriteLine(notesList.Count + " " + linksList.Count);
             using var conn = new NpgsqlConnection(adminCs); conn.Open();
             using var cmd = new NpgsqlCommand(sql, conn); cmd.ExecuteNonQuery();
             UpdateNote(); UpdateLinks(); notesJurnal.Clear(); OpenMain();
