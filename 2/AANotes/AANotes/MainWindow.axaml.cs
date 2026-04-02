@@ -13,6 +13,7 @@ namespace AANotes
     public partial class MainWindow : Window
     {
         private static readonly string targetDbName = "NotesLD";
+        private static readonly string adminCs1 = "Host=localhost;Username=postgres;Password=123;Database=postgres";
         private static readonly string adminCs = "Host=localhost;Port=5432;Username=postgres;Password=123;Database=postgres";
         private static readonly string cs = "Host=localhost;Port=5432;Username=postgres;Password=123;Database=NotesLD";
         private static readonly string[] sqlCreate = [
@@ -87,7 +88,7 @@ namespace AANotes
         }
         public static void DropDatabase()
         {
-            using var conn = new NpgsqlConnection(adminCs); conn.Open();
+            using var conn = new NpgsqlConnection(adminCs1); conn.Open();
             var sql = $"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{targetDbName}' AND pid <> pg_backend_pid(); DROP DATABASE IF EXISTS {targetDbName};";
             using var cmd = new NpgsqlCommand(sql, conn); cmd.ExecuteNonQuery();
         }
