@@ -80,10 +80,8 @@ namespace AANotes
         {
             if (!File.Exists(path)) return;
             var json = File.ReadAllText(path); var db = JsonSerializer.Deserialize<BDBackup>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new BDBackup();
-            Console.WriteLine(json);
-            notesList = db.Notes; linksList = db.Links;
-            Console.WriteLine(notesList.Count + " " + linksList.Count + " " + db.Notes.Count + " " + db.Links.Count);
-            DropDatabase(); OpenBD(false);
+            
+            notesList = db.Notes; linksList = db.Links; DropDatabase(); OpenBD(false);
             Console.WriteLine(notesList.Count + " " + linksList.Count + " " + db.Notes.Count + " " + db.Links.Count);
             /*
             var sql1 = "COPY note (id, title, text, time_editor) FROM stdin;\n";
@@ -97,7 +95,8 @@ namespace AANotes
             */
             for (int i = 0; i < notesList.Count; i++) NewNote(notesList[i].Id, notesList[i].Title, notesList[i].Text, notesList[i].TimeEditor);
             for (int i = 0; i < linksList.Count; i++) NewLinks(linksList[i].Id, linksList[i].IdNote, linksList[i].Link);
-            UpdateNote(); UpdateLinks(); notesJurnal.Clear(); OpenMain();
+            UpdateNote(); UpdateLinks();
+            notesJurnal.Clear(); OpenMain();
         }
         public static void DropDatabase()
         {
