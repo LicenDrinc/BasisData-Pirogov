@@ -83,7 +83,7 @@ namespace AANotes
 
             notesList = db.Notes; linksList = db.Links; DropDatabase(); OpenBD(false);
 
-            string sql1 = "COPY note (id, title, text, time_editor) FROM stdin;\n", sql2 = "COPY links_in_note (id, id_note, link_out) FROM stdin;\n";
+            string sql1 = "COPY public.note (id, title, text, time_editor) FROM stdin;\n", sql2 = "COPY public.links_in_note (id, id_note, link_out) FROM stdin;\n";
             int id1 = 0, id2 = 0;
             for (int i = 0; i < notesList.Count; i++)
             {
@@ -96,22 +96,22 @@ namespace AANotes
                 sql2 += linksList[i].Id + "\t" + linksList[i].IdNote + "\t" + TextRN(linksList[i].Link) + "\n";
             }
             sql1 += "\\."; sql2 += "\\.";
-            var sql = $"ALTER DATABASE \"{targetDbName}\" OWNER TO postgres;" +
-                $"ALTER TABLE links_in_note OWNER TO postgres;" +
-                $"ALTER SEQUENCE links_in_note_id_seq OWNER TO postgres;" +
-                $"CREATE SEQUENCE links_in_note_id_seq\r\n    AS integer\r\n    START WITH 1\r\n    INCREMENT BY 1\r\n    NO MINVALUE\r\n    NO MAXVALUE\r\n    CACHE 1;" +
-                $"ALTER SEQUENCE links_in_note_id_seq OWNED BY links_in_note.id;" +
-                $"ALTER TABLE note OWNER TO postgres;" +
-                $"CREATE SEQUENCE note_id_seq\r\n    AS integer\r\n    START WITH 1\r\n    INCREMENT BY 1\r\n    NO MINVALUE\r\n    NO MAXVALUE\r\n    CACHE 1;" +
-                $"ALTER SEQUENCE note_id_seq OWNER TO postgres;" +
-                $"ALTER SEQUENCE note_id_seq OWNED BY note.id;" +
-                $"ALTER TABLE ONLY links_in_note ALTER COLUMN id SET DEFAULT nextval('links_in_note_id_seq'::regclass);" +
-                $"ALTER TABLE ONLY note ALTER COLUMN id SET DEFAULT nextval('note_id_seq'::regclass);" +
+            var sql = $"ALTER DATABASE \"{targetDbName}\" OWNER TO postgres;\n" +
+                $"ALTER TABLE public.links_in_note OWNER TO postgres;\n" +
+                $"ALTER SEQUENCE public.links_in_note_id_seq OWNER TO postgres;\n" +
+                $"CREATE SEQUENCE public.links_in_note_id_seq\r\n    AS integer\r\n    START WITH 1\r\n    INCREMENT BY 1\r\n    NO MINVALUE\r\n    NO MAXVALUE\r\n    CACHE 1;\n" +
+                $"ALTER SEQUENCE public.links_in_note_id_seq OWNED BY public.links_in_note.id;\n" +
+                $"ALTER TABLE public.note OWNER TO postgres;\n" +
+                $"CREATE SEQUENCE public.note_id_seq\r\n    AS integer\r\n    START WITH 1\r\n    INCREMENT BY 1\r\n    NO MINVALUE\r\n    NO MAXVALUE\r\n    CACHE 1;\n" +
+                $"ALTER SEQUENCE public.note_id_seq OWNER TO postgres;\n" +
+                $"ALTER SEQUENCE public.note_id_seq OWNED BY public.note.id;\n" +
+                $"ALTER TABLE ONLY public.links_in_note ALTER COLUMN id SET DEFAULT nextval('public.links_in_note_id_seq'::regclass);\n" +
+                $"ALTER TABLE ONLY public.note ALTER COLUMN id SET DEFAULT nextval('public.note_id_seq'::regclass);\n" +
                 "\n" + sql2 + "\n" + sql1 + "\n" + 
-                $"SELECT pg_catalog.setval('links_in_note_id_seq', {id2}, true);" +
-                $"SELECT pg_catalog.setval('note_id_seq', {id1}, true);" +
-                $"ALTER TABLE ONLY links_in_note\r\n    ADD CONSTRAINT links_in_note_pkey PRIMARY KEY (id);" +
-                $"ALTER TABLE ONLY note\r\n    ADD CONSTRAINT note_pkey PRIMARY KEY (id);";
+                $"SELECT pg_catalog.setval('public.links_in_note_id_seq', {id2}, true);\n" +
+                $"SELECT pg_catalog.setval('public.note_id_seq', {id1}, true);\n" +
+                $"ALTER TABLE ONLY links_in_note\r\n    ADD CONSTRAINT links_in_note_pkey PRIMARY KEY (id);\n" +
+                $"ALTER TABLE ONLY note\r\n    ADD CONSTRAINT note_pkey PRIMARY KEY (id);\n";
             Console.WriteLine(sql); Console.WriteLine(notesList.Count + " " + linksList.Count);
             using var conn = new NpgsqlConnection(adminCs); conn.Open();
             using var cmd = new NpgsqlCommand(sql, conn); cmd.ExecuteNonQuery();
