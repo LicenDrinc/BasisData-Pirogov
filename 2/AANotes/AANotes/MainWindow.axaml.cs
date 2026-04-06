@@ -82,6 +82,8 @@ namespace AANotes
             var json = File.ReadAllText(path); var db = JsonSerializer.Deserialize<BDBackup>(json) ?? new BDBackup();
 
             notesList = db.Notes; linksList = db.Links; DropDatabase(); OpenBD();
+            Console.WriteLine(notesList.Count + " " + linksList.Count + " " + db.Notes.Count + " " + db.Links.Count);
+            /*
             var sql1 = "COPY note (id, title, text, time_editor) FROM stdin;\n";
             var sql2 = "COPY links_in_note (id, id_note, link_out) FROM stdin;\n";
             for (int i = 0; i < notesList.Count; i++) sql1 += notesList[i].Id + "\t" + notesList[i].Title + "\t" + notesList[i].Text + "\t" + notesList[i].TimeEditor + "\n";
@@ -90,6 +92,9 @@ namespace AANotes
             Console.WriteLine(sql); Console.WriteLine(notesList.Count + " " + linksList.Count);
             using var conn = new NpgsqlConnection(adminCs); conn.Open();
             using var cmd = new NpgsqlCommand(sql, conn); cmd.ExecuteNonQuery();
+            */
+            for (int i = 0; i < notesList.Count; i++) NewNote(notesList[i].Id, notesList[i].Title, notesList[i].Text, notesList[i].TimeEditor);
+            for (int i = 0; i < linksList.Count; i++) NewLinks(linksList[i].Id, linksList[i].IdNote, linksList[i].Link);
             UpdateNote(); UpdateLinks(); notesJurnal.Clear(); OpenMain();
         }
         public static void DropDatabase()
