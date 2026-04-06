@@ -17,8 +17,8 @@ namespace AANotes
         private static readonly string adminCs = "Host=localhost;Port=5432;Username=postgres;Password=123;Database=postgres";
         private static readonly string cs = "Host=localhost;Port=5432;Username=postgres;Password=123;Database=NotesLD";
         private static readonly string[] sqlCreate = [
-            "note (id SERIAL PRIMARY KEY, title TEXT, text TEXT, time_editor TIMESTAMP NOT NULL DEFAULT now());",
-            "links_in_note (id SERIAL PRIMARY KEY, id_note INT, link_out TEXT)"
+            "public.note (id SERIAL PRIMARY KEY, title TEXT, text TEXT, time_editor TIMESTAMP NOT NULL DEFAULT now());",
+            "public.links_in_note (id SERIAL PRIMARY KEY, id_note INT, link_out TEXT)"
             ];
         public NpgsqlConnection conn = new();
         public List<BDNotes> notesList = new(); public List<BDLinks> linksList = new();
@@ -98,11 +98,11 @@ namespace AANotes
             sql1 += "\\."; sql2 += "\\.";
             var sql = $"ALTER DATABASE \"{targetDbName}\" OWNER TO postgres;\n" +
                 $"ALTER TABLE public.links_in_note OWNER TO postgres;\n" +
+                $"CREATE SEQUENCE public.links_in_note_id_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;\n" +
                 $"ALTER SEQUENCE public.links_in_note_id_seq OWNER TO postgres;\n" +
-                $"CREATE SEQUENCE public.links_in_note_id_seq\r\n    AS integer\r\n    START WITH 1\r\n    INCREMENT BY 1\r\n    NO MINVALUE\r\n    NO MAXVALUE\r\n    CACHE 1;\n" +
                 $"ALTER SEQUENCE public.links_in_note_id_seq OWNED BY public.links_in_note.id;\n" +
                 $"ALTER TABLE public.note OWNER TO postgres;\n" +
-                $"CREATE SEQUENCE public.note_id_seq\r\n    AS integer\r\n    START WITH 1\r\n    INCREMENT BY 1\r\n    NO MINVALUE\r\n    NO MAXVALUE\r\n    CACHE 1;\n" +
+                $"CREATE SEQUENCE public.note_id_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;\n" +
                 $"ALTER SEQUENCE public.note_id_seq OWNER TO postgres;\n" +
                 $"ALTER SEQUENCE public.note_id_seq OWNED BY public.note.id;\n" +
                 $"ALTER TABLE ONLY public.links_in_note ALTER COLUMN id SET DEFAULT nextval('public.links_in_note_id_seq'::regclass);\n" +
@@ -110,8 +110,8 @@ namespace AANotes
                 "\n" + sql2 + "\n" + sql1 + "\n" + 
                 $"SELECT pg_catalog.setval('public.links_in_note_id_seq', {id2}, true);\n" +
                 $"SELECT pg_catalog.setval('public.note_id_seq', {id1}, true);\n" +
-                $"ALTER TABLE ONLY links_in_note\r\n    ADD CONSTRAINT links_in_note_pkey PRIMARY KEY (id);\n" +
-                $"ALTER TABLE ONLY note\r\n    ADD CONSTRAINT note_pkey PRIMARY KEY (id);\n";
+                $"ALTER TABLE ONLY links_in_note ADD CONSTRAINT links_in_note_pkey PRIMARY KEY (id);\n" +
+                $"ALTER TABLE ONLY note ADD CONSTRAINT note_pkey PRIMARY KEY (id);\n";
             Console.WriteLine(sql); Console.WriteLine(notesList.Count + " " + linksList.Count);
             using var conn = new NpgsqlConnection(adminCs); conn.Open();
             using var cmd = new NpgsqlCommand(sql, conn); cmd.ExecuteNonQuery();
