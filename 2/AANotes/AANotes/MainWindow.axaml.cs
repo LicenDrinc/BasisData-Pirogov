@@ -79,7 +79,7 @@ namespace AANotes
         public void LoadFromFile(string path)
         {
             if (!File.Exists(path)) return;
-            var json = File.ReadAllText(path); var db = JsonSerializer.Deserialize<BDBackup>(json) ?? new BDBackup();
+            var json = File.ReadAllText(path); var db = JsonSerializer.Deserialize<BDBackup>(json);
 
             notesList = db.Notes; linksList = db.Links; DropDatabase(); OpenBD();
             Console.WriteLine(notesList.Count + " " + linksList.Count + " " + db.Notes.Count + " " + db.Links.Count);
