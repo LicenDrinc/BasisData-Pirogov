@@ -80,7 +80,7 @@ namespace AANotes
         {
             if (!File.Exists(path)) return;
             var json = File.ReadAllText(path); var db = JsonSerializer.Deserialize<BDBackup>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new BDBackup();
-
+            Console.WriteLine(json);
             notesList = db.Notes; linksList = db.Links; DropDatabase(); OpenBD();
             Console.WriteLine(notesList.Count + " " + linksList.Count + " " + db.Notes.Count + " " + db.Links.Count);
             /*
