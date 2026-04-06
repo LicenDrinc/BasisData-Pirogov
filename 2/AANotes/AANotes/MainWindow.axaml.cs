@@ -35,12 +35,12 @@ namespace AANotes
         }
         public void OpenEditor() => MainContent.Content = new EditorView(this);
         public void OpenMain() => MainContent.Content = new MainView(this);
-        public void OpenBD()
+        public void OpenBD(bool update = true)
         {
             EnsureDatabaseExists();
             conn = OpenMainDatabase(cs);
             EnsureTables(conn);
-            UpdateNote(); UpdateLinks();
+            if (update) { UpdateNote(); UpdateLinks(); }
         }
         private static void EnsureDatabaseExists()
         {
@@ -83,7 +83,7 @@ namespace AANotes
             Console.WriteLine(json);
             notesList = db.Notes; linksList = db.Links;
             Console.WriteLine(notesList.Count + " " + linksList.Count + " " + db.Notes.Count + " " + db.Links.Count);
-            DropDatabase(); OpenBD();
+            DropDatabase(); OpenBD(false);
             Console.WriteLine(notesList.Count + " " + linksList.Count + " " + db.Notes.Count + " " + db.Links.Count);
             /*
             var sql1 = "COPY note (id, title, text, time_editor) FROM stdin;\n";
