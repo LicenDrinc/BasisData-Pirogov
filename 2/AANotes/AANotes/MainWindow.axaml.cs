@@ -53,7 +53,7 @@ namespace AANotes
 
             if (!exists)
             {
-                using var createCmd = new NpgsqlCommand($"CREATE DATABASE \"{targetDbName}\"", conn);
+                using var createCmd = new NpgsqlCommand($"CREATE DATABASE \"{targetDbName}\" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'C.UTF-8'", conn);
                 createCmd.ExecuteNonQuery();
             }
         }
@@ -80,15 +80,38 @@ namespace AANotes
         {
             if (!File.Exists(path)) return;
             var json = File.ReadAllText(path); var db = JsonSerializer.Deserialize<BDBackup>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new BDBackup();
-            
+
             notesList = db.Notes; linksList = db.Links; DropDatabase(); OpenBD(false);
-            Console.WriteLine(notesList.Count + " " + linksList.Count + " " + db.Notes.Count + " " + db.Links.Count);
-            
-            var sql1 = "COPY note (id, title, text, time_editor) FROM stdin;\n";
-            var sql2 = "COPY links_in_note (id, id_note, link_out) FROM stdin;\n";
-            for (int i = 0; i < notesList.Count; i++) sql1 += notesList[i].Id + "\t" + TextRN(notesList[i].Title) + "\t" + TextRN(notesList[i].Text) + "\t" + notesList[i].TimeEditor + "\n";
-            for (int i = 0; i < linksList.Count; i++) sql2 += linksList[i].Id + "\t" + linksList[i].IdNote + "\t" + TextRN(linksList[i].Link) + "\n";
-            sql1 += "\\."; sql2 += "\\."; var sql = sql1 + "\n" + sql2;
+
+            string sql1 = "COPY note (id, title, text, time_editor) FROM stdin;\n", sql2 = "COPY links_in_note (id, id_note, link_out) FROM stdin;\n";
+            int id1 = 0, id2 = 0;
+            for (int i = 0; i < notesList.Count; i++)
+            {
+                if (id1 < notesList[i].Id) id1 = notesList[i].Id;
+                sql1 += notesList[i].Id + "\t" + TextRN(notesList[i].Title) + "\t" + TextRN(notesList[i].Text) + "\t" + notesList[i].TimeEditor + "\n";
+            }
+            for (int i = 0; i < linksList.Count; i++)
+            {
+                if (id2 < linksList[i].Id) id2 = linksList[i].Id;
+                sql2 += linksList[i].Id + "\t" + linksList[i].IdNote + "\t" + TextRN(linksList[i].Link) + "\n";
+            }
+            sql1 += "\\."; sql2 += "\\.";
+            var sql = $"ALTER DATABASE \"{targetDbName}\" OWNER TO postgres;" +
+                $"ALTER TABLE links_in_note OWNER TO postgres;" +
+                $"ALTER SEQUENCE links_in_note_id_seq OWNER TO postgres;" +
+                $"CREATE SEQUENCE links_in_note_id_seq\r\n    AS integer\r\n    START WITH 1\r\n    INCREMENT BY 1\r\n    NO MINVALUE\r\n    NO MAXVALUE\r\n    CACHE 1;" +
+                $"ALTER SEQUENCE links_in_note_id_seq OWNED BY links_in_note.id;" +
+                $"ALTER TABLE note OWNER TO postgres;" +
+                $"CREATE SEQUENCE note_id_seq\r\n    AS integer\r\n    START WITH 1\r\n    INCREMENT BY 1\r\n    NO MINVALUE\r\n    NO MAXVALUE\r\n    CACHE 1;" +
+                $"ALTER SEQUENCE note_id_seq OWNER TO postgres;" +
+                $"ALTER SEQUENCE note_id_seq OWNED BY note.id;" +
+                $"ALTER TABLE ONLY links_in_note ALTER COLUMN id SET DEFAULT nextval('links_in_note_id_seq'::regclass);" +
+                $"ALTER TABLE ONLY note ALTER COLUMN id SET DEFAULT nextval('note_id_seq'::regclass);" +
+                "\n" + sql2 + "\n" + sql1 + "\n" + 
+                $"SELECT pg_catalog.setval('links_in_note_id_seq', {id2}, true);" +
+                $"SELECT pg_catalog.setval('note_id_seq', {id1}, true);" +
+                $"ALTER TABLE ONLY links_in_note\r\n    ADD CONSTRAINT links_in_note_pkey PRIMARY KEY (id);" +
+                $"ALTER TABLE ONLY note\r\n    ADD CONSTRAINT note_pkey PRIMARY KEY (id);";
             Console.WriteLine(sql); Console.WriteLine(notesList.Count + " " + linksList.Count);
             using var conn = new NpgsqlConnection(adminCs); conn.Open();
             using var cmd = new NpgsqlCommand(sql, conn); cmd.ExecuteNonQuery();
