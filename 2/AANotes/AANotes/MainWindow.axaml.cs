@@ -81,7 +81,9 @@ namespace AANotes
             if (!File.Exists(path)) return;
             var json = File.ReadAllText(path); var db = JsonSerializer.Deserialize<BDBackup>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new BDBackup();
             Console.WriteLine(json);
-            notesList = db.Notes; linksList = db.Links; DropDatabase(); OpenBD();
+            notesList = db.Notes; linksList = db.Links;
+            Console.WriteLine(notesList.Count + " " + linksList.Count + " " + db.Notes.Count + " " + db.Links.Count);
+            DropDatabase(); OpenBD();
             Console.WriteLine(notesList.Count + " " + linksList.Count + " " + db.Notes.Count + " " + db.Links.Count);
             /*
             var sql1 = "COPY note (id, title, text, time_editor) FROM stdin;\n";
