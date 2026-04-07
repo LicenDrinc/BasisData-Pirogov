@@ -196,7 +196,7 @@ namespace AANotes
             using var cmd = new NpgsqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@title", title);
             cmd.Parameters.AddWithValue("@text", text);
-            cmd.Parameters.AddWithValue("@text", time);
+            cmd.Parameters.AddWithValue("@time", time);
             cmd.ExecuteScalar();
         }
         public void DeleteNote()
