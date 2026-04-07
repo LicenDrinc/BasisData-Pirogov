@@ -82,7 +82,7 @@ namespace AANotes
             var json = File.ReadAllText(path); var db = JsonSerializer.Deserialize<BDBackup>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new BDBackup();
 
             notesList = db.Notes; linksList = db.Links; DropDatabase(); OpenBD(false);
-
+            /*
             string sql1 = "COPY public.note (id, title, text, time_editor) FROM stdin;\n", sql2 = "COPY public.links_in_note (id, id_note, link_out) FROM stdin;\n";
             int id1 = 0, id2 = 0;
             for (int i = 0; i < notesList.Count; i++)
@@ -115,9 +115,15 @@ namespace AANotes
             Console.WriteLine(sql); Console.WriteLine(notesList.Count + " " + linksList.Count);
             using var conn = new NpgsqlConnection(adminCs); conn.Open();
             using var cmd = new NpgsqlCommand(sql, conn); cmd.ExecuteNonQuery();
+            */
             
-            //for (int i = 0; i < notesList.Count; i++) NewNote(notesList[i].Id, notesList[i].Title, notesList[i].Text, notesList[i].TimeEditor);
-            //for (int i = 0; i < linksList.Count; i++) NewLinks(linksList[i].Id, linksList[i].IdNote, linksList[i].Link);
+            for (int i = 0; i < notesList.Count; i++) NewNote(notesList[i].Title, notesList[i].Text, notesList[i].TimeEditor);
+            for (int i = 0; i < linksList.Count; i++)
+            {
+                int j = 0;
+                for (int i1 = 0; i1 < notesList.Count; i1++) { if (linksList[i].IdNote == notesList[i1].Id) j = i1; }
+                if (j != 0) NewLinks(j, linksList[i].Link);
+            }
             UpdateNote(); UpdateLinks();
             notesJurnal.Clear(); OpenMain();
         }
@@ -193,16 +199,6 @@ namespace AANotes
             cmd.Parameters.AddWithValue("@text", time);
             cmd.ExecuteScalar();
         }
-        public void NewNote(int id, string title, string text, DateTime time)
-        {
-            const string sql = "INSERT INTO note (id, title, text, time_editor) VALUES (@id, @title, @text, @time)";
-            using var cmd = new NpgsqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@id", id);
-            cmd.Parameters.AddWithValue("@title", title);
-            cmd.Parameters.AddWithValue("@text", text);
-            cmd.Parameters.AddWithValue("@text", time);
-            cmd.ExecuteScalar();
-        }
         public void DeleteNote()
         {
             var sql = $"DELETE FROM note WHERE id = {indexBDNotes}";
@@ -229,15 +225,6 @@ namespace AANotes
         {
             const string sql = "INSERT INTO links_in_note (id_note, link_out) VALUES (@id_note, @link_out)";
             using var cmd = new NpgsqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@id_note", idNote);
-            cmd.Parameters.AddWithValue("@link_out", link);
-            cmd.ExecuteScalar();
-        }
-        public void NewLinks(int id, int idNote, string link)
-        {
-            const string sql = "INSERT INTO links_in_note (id, id_note, link_out) VALUES (@id, @id_note, @link_out)";
-            using var cmd = new NpgsqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@id", id);
             cmd.Parameters.AddWithValue("@id_note", idNote);
             cmd.Parameters.AddWithValue("@link_out", link);
             cmd.ExecuteScalar();
