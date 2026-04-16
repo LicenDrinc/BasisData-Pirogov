@@ -37,7 +37,7 @@ namespace AANotes
             using var checkCmd = new NpgsqlCommand("SELECT 1 FROM pg_database WHERE datname = @name", conn); checkCmd.Parameters.AddWithValue("name", targetDbName);
             var exists = checkCmd.ExecuteScalar() != null;
 
-            if (!exists) { using var createCmd = new NpgsqlCommand($"CREATE DATABASE \"{targetDbName}\" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'C.UTF-8'", conn);
+            if (!exists) { using var createCmd = new NpgsqlCommand($"CREATE DATABASE \"{targetDbName}\"", conn);
                 createCmd.ExecuteNonQuery(); }
         }
         private static NpgsqlConnection OpenMainDatabase(string cs)
