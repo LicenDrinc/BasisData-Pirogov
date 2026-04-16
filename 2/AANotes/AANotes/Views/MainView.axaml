@@ -1,41 +1,21 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="AANotes.Views.MainView">
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="AANotes.Views.MainView">
+	
 	<Grid>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="auto"/>
-			<RowDefinition Height="auto"/>
-			<RowDefinition Height="*"/>
+			<RowDefinition Height="auto"/> <RowDefinition Height="auto"/> <RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="*"/>
-			<ColumnDefinition Width="Auto"/>
+			<ColumnDefinition Width="*"/> <ColumnDefinition Width="Auto"/>
 		</Grid.ColumnDefinitions>
 
 		<Menu Grid.Row="0" Grid.ColumnSpan="2">
 			<MenuItem Header="Файл">
-				<MenuItem Header="Новая" Click="OnNew"/>
-				<MenuItem Header="Загрузить" Click="OnLoadAsync"/>
-				<MenuItem Header="Сохранить" Click="OnSaveAsync"/>
-			</MenuItem>
-
-			<MenuItem Header="Правка">
-				<MenuItem Header="Копировать"/>
-				<MenuItem Header="Вставить"/>
-			</MenuItem>
-
-			<MenuItem Header="Справка">
-				<MenuItem Header="О программе"/>
+				<MenuItem Header="Новая" Click="OnNew"/> <MenuItem Header="Загрузить" Click="OnLoadAsync"/> <MenuItem Header="Сохранить" Click="OnSaveAsync"/>
 			</MenuItem>
 		</Menu>
 
-		<TextBox x:Name="Search" Watermark="Поиск" Height="30"
-				 Grid.Row="1" Grid.Column="0" TextChanged="OnSearch"
-				 Margin="20,15,5,10" FontSize="14" CornerRadius="10"
-				 Background="#242424" BorderBrush="#0088ff"/>
-		<Button Content="Новая" Click="OnNew" Height="30"
-				Grid.Row="1" Grid.Column="1"
-				Margin="5,15,20,10"/>
+		<TextBox x:Name="Search" Watermark="Поиск" Height="30" Grid.Row="1" Grid.Column="0" TextChanged="OnSearch" Margin="20,5,5,5" FontSize="14" CornerRadius="10" Background="#242424" BorderBrush="#0088ff"/>
+		<Button Content="Новая" Click="OnNew" Height="30" Grid.Row="1" Grid.Column="1" Margin="5,5,20,5" Background="#252525"/>
 
 		<ScrollViewer Grid.Row="2" Grid.ColumnSpan="2">
 			<WrapPanel x:Name="NotesContainer" Margin="10"/>

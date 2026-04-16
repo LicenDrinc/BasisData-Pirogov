@@ -1,43 +1,25 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="AANotes.Views.EditorView">
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="AANotes.Views.EditorView">
 
 	<Grid>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="auto"/>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="auto"/>
-			<RowDefinition Height="auto"/>
+			<RowDefinition Height="auto"/> <RowDefinition Height="*"/> <RowDefinition Height="auto"/> <RowDefinition Height="auto"/>
 		</Grid.RowDefinitions>
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="Auto"/>
-			<ColumnDefinition Width="*"/>
-			<ColumnDefinition Width="Auto"/>
+			<ColumnDefinition Width="Auto"/> <ColumnDefinition Width="*"/> <ColumnDefinition Width="Auto"/>
 		</Grid.ColumnDefinitions>
 
-		<Button Content="Назад" Click="OnBack" Height="30"
-				Grid.Row="0" Grid.Column="0"
-				Margin="20,15,5,10"/>
-		<TextBox x:Name="title" Watermark="Заголовок" Height="30"
-				 Grid.Row="0" Grid.Column="1"
-				 Margin="5,15,5,10" FontSize="14" CornerRadius="10"
-				 Background="#242424" BorderBrush="#0088ff"/>
-		<Button Content="Удалить" Click="OnDelete" Height="30"
-				Grid.Row="0" Grid.Column="2"
-				Margin="5,15,20,10"/>
+		<Button Content="Назад" Click="OnBack" Height="30" Grid.Row="0" Grid.Column="0" Margin="20,10,5,5" Background="#252525"/>
+		<TextBox x:Name="title" Watermark="Заголовок" Height="30" Grid.Row="0" Grid.Column="1" Margin="5,10,5,5" FontSize="14" CornerRadius="10" Background="#242424" BorderBrush="#0088ff"/>
+		<Button Content="Удалить" Click="OnDelete" Height="30" Grid.Row="0" Grid.Column="2" Margin="5,10,20,5" Background="#252525"/>
 
-		<TextBox Grid.Row="1" Grid.ColumnSpan="3"
-				 x:Name="Editor" Watermark="Тут ничего нет"
-			     PointerReleased="Editor_PointerReleased"
-				 AcceptsReturn="True" TextWrapping="Wrap"
-				 Margin="10" FontSize="14" CornerRadius="10"
-				 Background="#171717" BorderBrush="#171717"/>
+		<TextBox Grid.Row="1" Grid.ColumnSpan="3" x:Name="Editor" Watermark="Тут ничего нет" PointerReleased="Editor_PointerReleased" AcceptsReturn="True" TextWrapping="Wrap"
+				 Margin="10,5,10,5" FontSize="14" CornerRadius="10" Background="#171717" BorderBrush="#171717"/>
 
 		<ScrollViewer Grid.Row="2" Grid.ColumnSpan="3" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
 			<StackPanel Orientation="Horizontal" Margin="5,0,5,5">
-				<Button Content="удалить" Click="OnDeleteLink" Margin="5,0,5,5"/>
-				<Button Content="добавить ссылку на заметку" Click="OnNewLinkNote" Margin="5,0,5,5"/>
-				<Button Content="добавить ссылку на сайт" Click="OnNewLinkHttp" Margin="5,0,5,5"/>
+				<Button Content="удалить" Click="OnDeleteLink" Margin="5,0,5,5" FontSize="14" Background="#252525"/>
+				<Button Content="добавить ссылку на заметку" Click="OnNewLinkNote" Margin="5,0,5,5" FontSize="14" Background="#252525"/>
+				<Button Content="добавить ссылку на сайт" Click="OnNewLinkHttp" Margin="5,0,5,5" FontSize="14" Background="#252525"/>
 			</StackPanel>
 		</ScrollViewer>
 		<ScrollViewer Grid.Row="3" Grid.ColumnSpan="3" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">

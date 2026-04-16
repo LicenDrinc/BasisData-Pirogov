@@ -1,10 +1,8 @@
 ﻿using AANotes.Windows;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -46,9 +44,7 @@ public partial class EditorView : UserControl
         {
             var nj = _mainWindow.notesJurnal; var nl = _mainWindow.notesList;
             for (int i = 0; i < nl.Count; i++)
-            {
-                if (nl[i].Id == nj[^1]) { _mainWindow.indexListNotes = i; _mainWindow.indexBDNotes = nl[i].Id; break; }
-            }
+            { if (nl[i].Id == nj[^1]) { _mainWindow.indexListNotes = i; _mainWindow.indexBDNotes = nl[i].Id; break; } }
             nj.RemoveAt(nj.Count - 1); _mainWindow.OpenEditor();
         }
     }
@@ -58,30 +54,20 @@ public partial class EditorView : UserControl
         {
             var links = _mainWindow.linksList;
             for (int i = 0; i < links.Count; i++)
-            {
-                if (links[i].IdNote == _mainWindow.indexBDNotes)
-                {
-                    _mainWindow.indexListLinks = i; _mainWindow.indexBDLinks = links[i].Id;
-                    _mainWindow.DeleteLinks();
-                }
-            }
+            { if (links[i].IdNote == _mainWindow.indexBDNotes) { _mainWindow.indexListLinks = i; _mainWindow.indexBDLinks = links[i].Id; _mainWindow.DeleteLinks(); } }
         }
         _mainWindow.DeleteNote(); _mainWindow.UpdateNote(); _mainWindow.UpdateLinks(); _mainWindow.OpenMain();
     }
     private void Editor_PointerReleased(object? sender, PointerReleasedEventArgs e)
     {
         if (sender is not TextBox tb) return;
-
         if ((e.KeyModifiers & KeyModifiers.Control) != 0)
         {
             Dispatcher.UIThread.Post(() =>
             {
                 int caret = tb.CaretIndex; string word = GetWordAt(tb.Text ?? "", caret);
-
                 if (!string.IsNullOrEmpty(word) && word.Length > 2 && word.StartsWith("{") && word.EndsWith("}"))
-                {
-                    if (int.TryParse(word[1..^1], out int idLink)) { if (!(idLink < 1 || idLink > linksId.Count)) OpenLink(linksId[idLink - 1]); }
-                }
+                { if (int.TryParse(word[1..^1], out int idLink)) { if (!(idLink < 1 || idLink > linksId.Count)) OpenLink(linksId[idLink - 1]); } }
                 else if (word.StartsWith("http://") || word.StartsWith("https://")) Process.Start(new ProcessStartInfo { FileName = word, UseShellExecute = true });
             });
         }
@@ -102,12 +88,9 @@ public partial class EditorView : UserControl
     private static string GetWordAt(string text, int index)
     {
         if (string.IsNullOrEmpty(text) || index >= text.Length) return "";
-
         int start = index; int end = index;
-
         while (start > 0 && !char.IsWhiteSpace(text[start - 1])) start--;
         while (end < text.Length && !char.IsWhiteSpace(text[end])) end++;
-
         return text[start..end];
     }
     private async void AddLinkNote()
@@ -173,15 +156,13 @@ public partial class EditorView : UserControl
         if (iBDN == -1) { title.Text = string.Empty; Editor.Text = string.Empty; }
         else
         {
-            title.Text = _mainWindow.notesList[iBDN].Title; Editor.Text = _mainWindow.notesList[iBDN].Text;
-            var links = _mainWindow.linksList;
+            title.Text = _mainWindow.notesList[iBDN].Title; Editor.Text = _mainWindow.notesList[iBDN].Text; var links = _mainWindow.linksList;
             for (int i = 0; i < links.Count; i++) { if (links[i].IdNote == _mainWindow.indexBDNotes) linksId.Add(i); }
         }
     }
     private void ViewLinks()
     {
-        LinksContainer.Children.Clear();
-        linkBorder.Clear();
+        LinksContainer.Children.Clear(); linkBorder.Clear();
 
         if (linksId.Count == 0)
         {
@@ -200,51 +181,30 @@ public partial class EditorView : UserControl
             var ind = i;
 
             var mainTextBlock = new TextBlock
-            {
-                Text = $"{i + 1}. {ShortenTextByLines(LinkText(linksId[i]), 1, 20)}", FontSize = 12,
-                Foreground = new SolidColorBrush(Color.Parse("#ffffff")),
-                TextWrapping = TextWrapping.Wrap
-            };
+            { Text = $"{i + 1}. {ShortenTextByLines(LinkText(linksId[i]), 1, 20)}", FontSize = 12, Foreground = new SolidColorBrush(Color.Parse("#ffffff")), TextWrapping = TextWrapping.Wrap };
 
-            var linkPanel = new Border
-            {
-                Margin = new(5, 0, 5, 5), CornerRadius = new(5), Padding = new(5),
-                Background = new SolidColorBrush(Color.Parse("#252525")),
-                Child = mainTextBlock
-            };
+            var linkPanel = new Border { Margin = new(5, 0, 5, 5), CornerRadius = new(5), Padding = new(5), Background = new SolidColorBrush(Color.Parse("#252525")), Child = mainTextBlock };
 
             linkPanel.PointerPressed += (s, e) =>
             {
                 if (e.ClickCount == 1)
-                {
-                    LinkBorderDefault();
-                    linkPanel.Background = Brushes.DarkSlateGray;
-                    _mainWindow.indexListLinks = linksId[ind];
-                    _mainWindow.indexBDLinks = _mainWindow.linksList[linksId[ind]].Id;
-                }
-
+                { LinkBorderDefault(); linkPanel.Background = Brushes.DarkSlateGray; _mainWindow.indexListLinks = linksId[ind]; _mainWindow.indexBDLinks = _mainWindow.linksList[linksId[ind]].Id; }
                 if (e.ClickCount == 2) OpenLink(linksId[ind]);
             };
-            LinksContainer.Children.Add(linkPanel);
-            linkBorder.Add(linkPanel);
+            LinksContainer.Children.Add(linkPanel); linkBorder.Add(linkPanel);
         }
     }
     private void LinkBorderDefault() { for (int i = 0; i < linkBorder.Count; i++) linkBorder[i].Background = new SolidColorBrush(Color.Parse("#252525")); }
     private string LinkText(int i)
     {
         var link = _mainWindow.linksList[i]; var note = _mainWindow.notesList;
-        if (int.TryParse(link.Link, out int idNote)) { for (int j = 0; j < note.Count; j++) { if (note[j].Id == idNote) return note[j].Title; } }
-        else return link.Link;
-
+        if (int.TryParse(link.Link, out int idNote)) { for (int j = 0; j < note.Count; j++) { if (note[j].Id == idNote) return note[j].Title; } } else return link.Link;
         return "ERROR 404";
     }
     private static string ShortenTextByLines(string text, int maxLines, int charsPerLine, string plus = "")
     {
         if (string.IsNullOrWhiteSpace(text)) return "";
-
-        text = text.Replace("\r\n", "\n");
-        var lines = new List<string>(); var currentLine = "";
-
+        text = text.Replace("\r\n", "\n"); var lines = new List<string>(); var currentLine = "";
         foreach (var ch in text)
         {
             if (ch == '\n')
