@@ -9,7 +9,7 @@
 		</Grid.ColumnDefinitions>
 
 		<Menu Grid.Row="0" Grid.ColumnSpan="2">
-			<MenuItem Header="Файл">
+			<MenuItem Header="БазаДанных">
 				<MenuItem Header="Новая" Click="OnNew"/> <MenuItem Header="Загрузить" Click="OnLoadAsync"/> <MenuItem Header="Сохранить" Click="OnSaveAsync"/>
 			</MenuItem>
 		</Menu>

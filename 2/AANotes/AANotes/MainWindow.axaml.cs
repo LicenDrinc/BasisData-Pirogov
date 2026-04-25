@@ -15,7 +15,7 @@ namespace AANotes
     {
         private static readonly string targetDbName = "NotesLD";
         private static readonly string adminCs = "Host=localhost;Port=5432;Username=postgres;Password=123;Database=postgres";
-        private static readonly string cs = "Host=localhost;Port=5432;Username=postgres;Password=123;Database=NotesLD";
+        private static readonly string cs =      "Host=localhost;Port=5432;Username=postgres;Password=123;Database=NotesLD";
         private static readonly string[] sqlCreate = [
             "note (id SERIAL PRIMARY KEY, title TEXT, text TEXT, time_editor TIMESTAMP NOT NULL DEFAULT now())",
             "links_in_note (id SERIAL PRIMARY KEY, id_note INT, link_out TEXT)"
@@ -29,16 +29,14 @@ namespace AANotes
 
         public MainWindow() { InitializeComponent(); OpenBD(); notesJurnal.Clear(); OpenMain(); }
         public void OpenEditor() => MainContent.Content = new EditorView(this);
-        public void OpenMain() => MainContent.Content = new MainView(this);
-        public void OpenBD(bool update = true) { EnsureDatabaseExists(); con = OpenMainDatabase(cs); EnsureTables(con); if (update) { UpdateNote(); UpdateLinks(); } }
-        private static void EnsureDatabaseExists()
+        public void OpenMain() =>   MainContent.Content = new MainView(this);
+        public void OpenBD(bool update = true) { CheckDatabase(); con = OpenMainDatabase(cs); CheckTables(con); if (update) { UpdateNote(); UpdateLinks(); } }
+        private static void CheckDatabase()
         {
             using var conn = new NpgsqlConnection(adminCs); conn.Open();
             using var checkCmd = new NpgsqlCommand("SELECT 1 FROM pg_database WHERE datname = @name", conn); checkCmd.Parameters.AddWithValue("name", targetDbName);
             var exists = checkCmd.ExecuteScalar() != null;
-
-            if (!exists) { using var createCmd = new NpgsqlCommand($"CREATE DATABASE \"{targetDbName}\"", conn);
-                createCmd.ExecuteNonQuery(); }
+            if (!exists) { using var createCmd = new NpgsqlCommand($"CREATE DATABASE \"{targetDbName}\"", conn); createCmd.ExecuteNonQuery(); }
         }
         private static NpgsqlConnection OpenMainDatabase(string cs)
         {
@@ -46,8 +44,8 @@ namespace AANotes
             { try { var conn = new NpgsqlConnection(cs); Console.WriteLine("Подключение..."); conn.Open(); Console.WriteLine("Подключено."); return conn; } catch { Thread.Sleep(300); } }
             throw new Exception("Не удалось подключиться к БД");
         }
-        private static void EnsureTables(NpgsqlConnection conn) { for (int i = 0; i < sqlCreate.Length; i++) EnsureTables(conn, i); }
-        private static void EnsureTables(NpgsqlConnection conn, int i) { using var cmd = new NpgsqlCommand("CREATE TABLE IF NOT EXISTS " + sqlCreate[i], conn); cmd.ExecuteNonQuery(); }
+        private static void CheckTables(NpgsqlConnection conn) { for (int i = 0; i < sqlCreate.Length; i++) CheckTables(conn, i); }
+        private static void CheckTables(NpgsqlConnection conn, int i) { using var cmd = new NpgsqlCommand("CREATE TABLE IF NOT EXISTS " + sqlCreate[i], conn); cmd.ExecuteNonQuery(); }
         private static void EnsureColumnExists(NpgsqlConnection conn, string table, string column, string typeAndOptions)
         { var sql = $"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {column} {typeAndOptions};"; using var cmd = new NpgsqlCommand(sql, conn); cmd.ExecuteNonQuery(); }
         public bool TableExists(string tableName) { string sql = "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = @name)";
@@ -83,8 +81,7 @@ namespace AANotes
             while (notesSort.Count < notesListDemo.Count)
             {
                 int l = 0; bool l1 = false;
-                for (int i = 0; i < notesListDemo.Count; i++)
-                { int k = 0; for (int j = 0; j < notesSort.Count; j++) {if (i == notesSort[j]) break; k++; }
+                for (int i = 0; i < notesListDemo.Count; i++) { int k = 0; for (int j = 0; j < notesSort.Count; j++) { if (i == notesSort[j]) break; k++; }
                     if (k == notesSort.Count) { if (notesListDemo[i].TimeEditor >= notesListDemo[l].TimeEditor) { l = i; l1 = true; } } else if (!l1) l++; }
                 notesSort.Add(l);
             }

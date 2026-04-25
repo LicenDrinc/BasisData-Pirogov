@@ -41,4 +41,10 @@
         </PackageReference>
         <PackageReference Include="Npgsql" Version="10.0.1" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Windows\AddDateBaseWindows.axaml.cs">
+        <DependentUpon>AddDateBaseWindows.axaml</DependentUpon>
+      </Compile>
+    </ItemGroup>
 </Project>
