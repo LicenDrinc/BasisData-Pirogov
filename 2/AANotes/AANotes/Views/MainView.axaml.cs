@@ -3,6 +3,7 @@ using Avalonia.Media;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using static AANotes.MainWindow;
 
 namespace AANotes.Views;
@@ -19,6 +20,7 @@ public partial class MainView : UserControl
         search = ""; LoadNotes(search);
     }
     private void OnOpenNote(object? sender, Avalonia.Interactivity.RoutedEventArgs e) { _mainWindow.OpenEditor(); }
+    private async void OnOpen(object? sender, Avalonia.Interactivity.RoutedEventArgs e) { _mainWindow.checkNewOpen = false; await _mainWindow.NewOpenBD(); }
     private void OnNew(object? sender, Avalonia.Interactivity.RoutedEventArgs e) { _mainWindow.indexBDNotes = -1; _mainWindow.indexListNotes = -1; _mainWindow.OpenEditor(); }
     private async void OnLoadAsync(object? sender, Avalonia.Interactivity.RoutedEventArgs e) { var Path = await _mainWindow.OpenFile(); if (Path != null) _mainWindow.LoadFromFile(Path); }
     private async void OnSaveAsync(object? sender, Avalonia.Interactivity.RoutedEventArgs e) { var Path = await _mainWindow.SaveFile(); if (Path != null) _mainWindow.SaveToFile(Path); }

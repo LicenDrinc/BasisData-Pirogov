@@ -1,5 +1,7 @@
 using AANotes.Views;
+using AANotes.Windows;
 using Avalonia.Controls;
+using Avalonia.Media;
 using Npgsql;
 using System;
 using System.Collections.Generic;
@@ -13,30 +15,54 @@ namespace AANotes
 {
     public partial class MainWindow : Window
     {
-        private static readonly string targetDbName = "NotesLD";
         private static readonly string adminCs = "Host=localhost;Port=5432;Username=postgres;Password=123;Database=postgres";
-        private static readonly string cs =      "Host=localhost;Port=5432;Username=postgres;Password=123;Database=NotesLD";
         private static readonly string[] sqlCreate = [
             "note (id SERIAL PRIMARY KEY, title TEXT, text TEXT, time_editor TIMESTAMP NOT NULL DEFAULT now())",
             "links_in_note (id SERIAL PRIMARY KEY, id_note INT, link_out TEXT)"
             ];
         private static readonly string[] sqlDelete = ["note", "links_in_note"];
+        public string cs = "Host=localhost;Port=5432;Username=postgres;Password=123;Database=NotesLD";
+        public readonly string csDefault = "Host=localhost;Port=5432;Username=postgres;Password=123;Database=NotesLD";
         public NpgsqlConnection con = new();
         public List<BDNotes> notesList = new(); public List<BDLinks> linksList = new();
-        public List<int> notesJurnal = new();   public List<int> notesSort = new();
-        public int indexBDNotes = 0; public int indexListNotes = 0;
-        public int indexBDLinks = 0; public int indexListLinks = 0;
+        public List<int> notesJurnal = new(), notesSort = new();
+        public int indexBDNotes = 0, indexListNotes = 0, indexBDLinks = 0, indexListLinks = 0;
+        public BDSettings settings = new();
+        public bool checkNewOpen;
 
-        public MainWindow() { InitializeComponent(); OpenBD(); notesJurnal.Clear(); OpenMain(); }
+        public MainWindow()
+        {
+            InitializeComponent(); Opened += MainWindow_Opened;
+        }
+
+        private async void MainWindow_Opened(object? sender, EventArgs e) { checkNewOpen = true; await NewOpenBD(); }
+        private async Task OpenAddDateBase() { AddDateBaseWindows a = new(this); var r = await a.ShowDialog<string?>((Window)VisualRoot); Console.WriteLine(r); checkNewOpen = true; }
+
+        public async Task NewOpenBD()
+        {
+            var w = new WrapPanel{ ItemWidth = double.NaN, ItemHeight = double.NaN, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+            w.Children.Add(new TextBlock { Text = "Загрузка...", FontSize = 16, Foreground = new SolidColorBrush(Color.Parse("#777777")),
+                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center }); MainContent.Content = w;
+            while (true)
+            {
+                var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\AANotes\\settings.json"; if (!File.Exists(path) || !checkNewOpen) { await OpenAddDateBase(); continue; }
+                var json = File.ReadAllText(path); var db = JsonSerializer.Deserialize<BDSettings>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (db == null) await OpenAddDateBase(); else { settings = db; break; }
+            }
+            cs = settings.GetConnectionString(); OpenBD(); notesJurnal.Clear(); OpenMain();
+        }
+
         public void OpenEditor() => MainContent.Content = new EditorView(this);
-        public void OpenMain() =>   MainContent.Content = new MainView(this);
-        public void OpenBD(bool update = true) { CheckDatabase(); con = OpenMainDatabase(cs); CheckTables(con); if (update) { UpdateNote(); UpdateLinks(); } }
-        private static void CheckDatabase()
+        public void OpenMain() => MainContent.Content = new MainView(this);
+        
+
+        public void OpenBD(bool update = true) { CheckDatabase(settings); con = OpenMainDatabase(cs); CheckTables(con); if (update) { UpdateNote(); UpdateLinks(); } }
+        private static void CheckDatabase(BDSettings s)
         {
             using var conn = new NpgsqlConnection(adminCs); conn.Open();
-            using var checkCmd = new NpgsqlCommand("SELECT 1 FROM pg_database WHERE datname = @name", conn); checkCmd.Parameters.AddWithValue("name", targetDbName);
+            using var checkCmd = new NpgsqlCommand("SELECT 1 FROM pg_database WHERE datname = @name", conn); checkCmd.Parameters.AddWithValue("name", s.Name);
             var exists = checkCmd.ExecuteScalar() != null;
-            if (!exists) { using var createCmd = new NpgsqlCommand($"CREATE DATABASE \"{targetDbName}\"", conn); createCmd.ExecuteNonQuery(); }
+            if (!exists) { using var createCmd = new NpgsqlCommand($"CREATE DATABASE \"{s.Name}\"", conn); createCmd.ExecuteNonQuery(); }
         }
         private static NpgsqlConnection OpenMainDatabase(string cs)
         {
@@ -48,24 +74,39 @@ namespace AANotes
         private static void CheckTables(NpgsqlConnection conn, int i) { using var cmd = new NpgsqlCommand("CREATE TABLE IF NOT EXISTS " + sqlCreate[i], conn); cmd.ExecuteNonQuery(); }
         private static void EnsureColumnExists(NpgsqlConnection conn, string table, string column, string typeAndOptions)
         { var sql = $"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {column} {typeAndOptions};"; using var cmd = new NpgsqlCommand(sql, conn); cmd.ExecuteNonQuery(); }
-        public bool TableExists(string tableName) { string sql = "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = @name)";
-            using var cmd = new NpgsqlCommand(sql, con); cmd.Parameters.AddWithValue("@name", tableName); return (bool)cmd.ExecuteScalar(); }
-        public void SaveToFile(string path) { var json = JsonSerializer.Serialize(new BDBackup(notesList, linksList), new JsonSerializerOptions { WriteIndented = true }); File.WriteAllText(path, json); }
-        public void LoadFromFile(string path)
+        public bool TableExists(string tableName)
+        {
+            string sql = "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = @name)";
+            using var cmd = new NpgsqlCommand(sql, con); cmd.Parameters.AddWithValue("@name", tableName); return (bool)cmd.ExecuteScalar();
+        }
+
+
+        public void SaveToFile(string path) { var json = JsonSerializer.Serialize(new BDBackup(notesList, linksList, settings), new JsonSerializerOptions { WriteIndented = true }); File.WriteAllText(path, json); }
+        public void LoadFromFile(string path, bool open = true)
         {
             if (!File.Exists(path)) return;
             var json = File.ReadAllText(path); var db = JsonSerializer.Deserialize<BDBackup>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new BDBackup();
-            notesList = db.Notes; linksList = db.Links; DropDatabase(con); OpenBD(false);
-            for (int i = 0; i < notesList.Count; i++) NewNote(notesList[i].Id ,notesList[i].Title, notesList[i].Text, notesList[i].TimeEditor);
+            notesList = db.Notes; linksList = db.Links; settings = db.Settings; cs = settings.GetConnectionString();
+            DropDatabase(con);
+            OpenBD(false);
+            for (int i = 0; i < notesList.Count; i++) NewNote(notesList[i].Id, notesList[i].Title, notesList[i].Text, notesList[i].TimeEditor);
             for (int i = 0; i < linksList.Count; i++) NewLinks(linksList[i].Id, linksList[i].IdNote, linksList[i].Link);
-            FixLinksSequence(); FixNoteSequence(); UpdateNote(); UpdateLinks(); notesJurnal.Clear(); OpenMain();
+            FixLinksSequence(); FixNoteSequence(); UpdateNote(); UpdateLinks();
+            if (open) { OpenMain(); notesJurnal.Clear(); }
         }
         public static void DropDatabase(NpgsqlConnection connn)
         { string sql = ""; for (int i = 0; i < sqlDelete.Length; i++) sql += $"TRUNCATE TABLE {sqlDelete[i]} RESTART IDENTITY CASCADE; "; using var cmd = new NpgsqlCommand(sql, connn); cmd.ExecuteNonQuery(); }
-        public async Task<string?> OpenFile() { var dialog = new OpenFileDialog { Title = "Выбери файл", AllowMultiple = false, Filters = { new FileDialogFilter { Name = "JSON", Extensions = { "json" } } } };
-            var result = await dialog.ShowAsync((Window)VisualRoot); return result?.FirstOrDefault(); }
-        public async Task<string?> SaveFile() { var dialog = new SaveFileDialog { Title = "Сохранить файл", DefaultExtension = "json", Filters = { new FileDialogFilter { Name = "JSON", Extensions = { "json" } } } };
-            return await dialog.ShowAsync((Window)VisualRoot); }
+        public async Task<string?> OpenFile()
+        {
+            var dialog = new OpenFileDialog { Title = "Выбери файл", AllowMultiple = false, Filters = { new FileDialogFilter { Name = "JSON", Extensions = { "json" } } } };
+            var result = await dialog.ShowAsync((Window)VisualRoot); return result?.FirstOrDefault();
+        }
+        public async Task<string?> SaveFile()
+        {
+            var dialog = new SaveFileDialog { Title = "Сохранить файл", DefaultExtension = "json", Filters = { new FileDialogFilter { Name = "JSON", Extensions = { "json" } } } };
+            return await dialog.ShowAsync((Window)VisualRoot);
+        }
+
 
         public void SaveNote()
         {
@@ -81,8 +122,11 @@ namespace AANotes
             while (notesSort.Count < notesListDemo.Count)
             {
                 int l = 0; bool l1 = false;
-                for (int i = 0; i < notesListDemo.Count; i++) { int k = 0; for (int j = 0; j < notesSort.Count; j++) { if (i == notesSort[j]) break; k++; }
-                    if (k == notesSort.Count) { if (notesListDemo[i].TimeEditor >= notesListDemo[l].TimeEditor) { l = i; l1 = true; } } else if (!l1) l++; }
+                for (int i = 0; i < notesListDemo.Count; i++)
+                {
+                    int k = 0; for (int j = 0; j < notesSort.Count; j++) { if (i == notesSort[j]) break; k++; }
+                    if (k == notesSort.Count) { if (notesListDemo[i].TimeEditor >= notesListDemo[l].TimeEditor) { l = i; l1 = true; } } else if (!l1) l++;
+                }
                 notesSort.Add(l);
             }
             for (int i = 0; i < notesSort.Count; i++) notesList.Add(notesListDemo[notesSort[i]]);
@@ -107,6 +151,7 @@ namespace AANotes
         public void DeleteNote() { var sql = $"DELETE FROM note WHERE id = {indexBDNotes}"; using var cmd = new NpgsqlCommand(sql, con); cmd.ExecuteNonQuery(); }
         public void FixNoteSequence()
         { const string sql = "SELECT setval(pg_get_serial_sequence('note', 'id'),COALESCE((SELECT MAX(id) FROM note), 1));"; using var cmd = new NpgsqlCommand(sql, con); cmd.ExecuteNonQuery(); }
+
 
         public void SaveLinks()
         {
@@ -157,11 +202,24 @@ namespace AANotes
 
         public class BDBackup
         {
+            public BDSettings Settings { get; set; }
             public List<BDNotes> Notes { get; set; }
             public List<BDLinks> Links { get; set; }
 
-            public BDBackup(List<BDNotes> n, List<BDLinks> l) { Notes = n; Links = l; }
-            public BDBackup() { Notes = new(); Links = new(); }
+            public BDBackup(List<BDNotes> n, List<BDLinks> l, BDSettings s) { Notes = n; Links = l; Settings = s; }
+            public BDBackup() { Notes = new(); Links = new(); Settings = new(); }
+        }
+
+        public class BDSettings
+        {
+            public string Name { get; set; }
+            public string Host { get; set; }
+            public string Port { get; set; }
+            public string Username { get; set; }
+            public string Password { get; set; }
+            public BDSettings(string n, string h, string p, string u, string pass) { Name = n; Host = h; Port = p; Username = u; Password = pass; }
+            public BDSettings() { Name = ""; Host = ""; Port = ""; Username = ""; Password = ""; }
+            public string GetConnectionString() => $"Host={Host};Port={Port};Username={Username};Password={Password};Database={Name}";
         }
     }
 }
