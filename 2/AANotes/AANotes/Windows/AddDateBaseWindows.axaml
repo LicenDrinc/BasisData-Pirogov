@@ -1,9 +1,9 @@
 <Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		mc:Ignorable="d" d:DesignWidth="0" d:DesignHeight="0" Width="400" Height="150" Background="#171717" x:Class="AANotes.Windows.AddDateBaseWindows" Title="Добавить ссылку">
+		mc:Ignorable="d" d:DesignWidth="0" d:DesignHeight="0" Width="400" Height="150" Background="#171717" x:Class="AANotes.Windows.AddDateBaseWindows" Title="Выбор базы данных">
 
     <StackPanel Margin="20" Spacing="10">
-		<TextBlock Text="Выберете создание базы данных:"/>
+		<TextBlock Text="Выберете потключение базы данных:"/>
 		<ComboBox Width="360" x:Name="BDType" SelectedIndex="0" SelectionChanged="UpdateParametrs">
 			<ComboBoxItem Tag="1" Content="Авто"/>
 			<ComboBoxItem Tag="2" Content="Существуещий"/>
